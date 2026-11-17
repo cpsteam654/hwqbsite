@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CTUB Operations Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Palette taken from ctubwv.com */
+:root{
+  --navy:#003F75;--navy-dk:#002A50;--blue:#095EA8;--link:#4078A8;--blue-lt:#E8F1F9;
+  --green:#71CB67;--green-dk:#2F7D2A;--green-lt:#E6F5E4;--waste:#3F8F3A;
+  --slate:#7C8B98;--ink:#1B1B1B;--soft:#55626D;--line:#DDE4EA;--page:#EFEFEF;--card:#fff;--red:#B23A2E;
+  --tint:#F2F7FC;
+  --ease:cubic-bezier(.6,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--page);color:var(--ink);font-family:"Open Sans",-apple-system,"Segoe UI",Arial,sans-serif;font-size:16px;line-height:1.55}
+h1,h2,h3,h4{margin:0;line-height:1.2}
+a{color:var(--link)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.ic{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.wrap{max-width:1060px;margin:0 auto;padding:22px 16px 56px}
+.card{background:var(--card);border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 10px 30px -18px rgba(0,40,80,.45);margin-bottom:20px;overflow:hidden}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.draft{display:inline-block;background:#C8962E;color:#fff;font-size:11px;font-weight:700;letter-spacing:1.6px;border-radius:4px;padding:3px 9px}
+.back{font-size:14px;font-weight:700;text-decoration:none;color:var(--navy)}
+.back:hover{text-decoration:underline}
+
+/* ---------- hero ---------- */
+.hero{display:grid;grid-template-columns:1.1fr 1fr;gap:28px;align-items:center;color:#fff;padding:34px 34px 30px;
+  background:radial-gradient(120% 140% at 100% 0%,var(--blue) 0%,var(--navy) 45%,var(--navy-dk) 100%)}
+.hero .k{font-size:12px;letter-spacing:1.6px;text-transform:uppercase;font-weight:700;color:var(--green)}
+.hero h1{font-size:38px;font-weight:800;letter-spacing:-.8px;line-height:1.08;margin-top:6px}
+.hero p{color:#cfe0f0;font-size:16.5px;margin:14px 0 22px;max-width:46ch}
+.nums{display:flex;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.18)}
+.nums>div{flex:1 1 25%;padding:12px 14px 0 0;min-width:110px}
+.nums b{display:block;font-size:24px;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
+.nums span{font-size:12px;color:#a9c3dc;line-height:1.3;display:block;margin-top:3px}
+.qs{display:flex;flex-direction:column;gap:10px}
+.qs .lbl{font-size:12px;letter-spacing:1.4px;text-transform:uppercase;font-weight:700;color:#a9c3dc;margin-bottom:2px}
+.qs a{display:flex;align-items:center;gap:14px;text-decoration:none;color:#fff;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:12px 14px;transition:background .2s,transform .2s var(--ease)}
+.qs a:hover{background:rgba(255,255,255,.13);transform:translateX(4px)}
+.qs svg.chk{width:34px;height:34px;flex:none}
+.qs .chk circle{fill:var(--green)}
+.qs .chk path{fill:none;stroke:var(--navy-dk);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:20;stroke-dashoffset:20}
+.hero.in .qs .chk path{animation:draw .5s var(--ease) forwards}
+.hero.in .qs a:nth-of-type(2) .chk path{animation-delay:.35s}
+.hero.in .qs a:nth-of-type(3) .chk path{animation-delay:.7s}
+@keyframes draw{to{stroke-dashoffset:0}}
+.qs b{display:block;font-size:16px}
+.qs span{display:block;font-size:13px;color:#bcd2e6;line-height:1.35}
+.qs i{margin-left:auto;font-style:normal;color:var(--green);font-weight:700}
+
+/* ---------- sections ---------- */
+.sec{padding:28px 30px 26px;scroll-margin-top:12px}
+.sh{display:flex;gap:16px;align-items:flex-start;margin-bottom:16px}
+.sh .num{font-size:40px;font-weight:800;line-height:.9;color:var(--c,var(--blue));letter-spacing:-1px}
+.sh .k{font-size:12px;letter-spacing:1.3px;text-transform:uppercase;font-weight:700;color:var(--c,var(--blue))}
+.sh h2{font-size:24px;font-weight:800;color:var(--navy);letter-spacing:-.3px;margin-top:2px}
+.lead{font-size:16.5px;margin:0 0 16px;max-width:70ch}
+.cols{display:grid;grid-template-columns:1fr 250px;gap:26px;align-items:start}
+.panel{background:var(--tint);border-radius:12px;padding:20px 22px}
+.stats{display:flex;flex-direction:column;gap:10px}
+.stats>div{background:var(--tint);border-radius:10px;padding:10px 14px}
+.panel .stats>div{background:#fff}
+.stats b{display:block;font-size:24px;font-weight:800;color:var(--c,var(--blue));line-height:1.1;font-variant-numeric:tabular-nums}
+.stats span{font-size:13px;color:var(--soft);line-height:1.35;display:block}
+.more{margin-top:16px;background:var(--tint);border-radius:10px}
+.panel .more{background:#fff}
+.more summary{cursor:pointer;list-style:none;padding:12px 16px;font-weight:700;font-size:14px;color:var(--c,var(--blue));display:flex;align-items:center;gap:8px;border-radius:10px}
+.more summary:hover{background:rgba(0,63,117,.04)}
+.more summary::-webkit-details-marker{display:none}
+.more summary::before{content:"+";display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--c,var(--blue));color:#fff;font-size:15px;line-height:1;transition:transform .25s}
+.more[open] summary::before{transform:rotate(45deg)}
+.more[open] .mbody{animation:swapin .35s var(--ease)}
+.mbody{font-size:15px;padding:0 16px 8px 44px}
+.mbody p{margin:0 0 10px}
+.mbody .box{background:#fff;border-radius:8px;padding:10px 14px;margin:0 0 10px}
+.panel .mbody .box{background:var(--tint)}
+@keyframes swapin{from{opacity:0;transform:translateY(10px)}}
+
+/* Q1: income squares */
+.gauge{position:relative;margin:56px 0 0}
+.gtrack{position:relative;display:flex;height:44px;border-radius:22px;background:linear-gradient(90deg,#EEF2F5 0 75%,#F9E1DE 75%)}
+.gtrack i{height:100%;width:0;transition:width 1.1s var(--ease)}
+.gtrack .gw{background:var(--blue);border-radius:22px 0 0 22px}
+.gtrack .gs{background:var(--waste);border-radius:0 22px 22px 0;transition-delay:.9s}
+.gzone{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:700;color:var(--red)}
+.gmark{position:absolute;left:75%;top:-10px;bottom:-10px;width:3px;margin-left:-1.5px;background:var(--red);border-radius:2px}
+.gmark span{position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);white-space:nowrap;font-size:12px;font-weight:700;color:var(--red)}
+.gpin{position:absolute;left:0;top:-38px;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:13px;font-weight:800;border-radius:999px;padding:3px 11px;white-space:nowrap;opacity:0;transition:left 2s var(--ease),opacity .4s}
+.gpin::after{content:"";position:absolute;left:50%;top:100%;margin-left:-5px;border:5px solid transparent;border-top-color:var(--navy)}
+.gauge.on .gpin{left:27.17%;opacity:1}
+.gscale{position:relative;height:18px;margin-top:8px;font-size:12px;color:var(--soft)}
+.gscale span{position:absolute;transform:translateX(-50%)}
+.gscale span:first-child{transform:none}
+.gscale span:last-child{transform:translateX(-100%)}
+.key{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:12px;font-size:13px;color:var(--soft)}
+.key span{display:inline-flex;align-items:center;gap:6px}
+.key i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.big{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:0 0 14px}
+.big b{font-size:44px;font-weight:800;color:var(--navy);letter-spacing:-1px;line-height:1;font-variant-numeric:tabular-nums}
+.big span{font-size:15px;color:var(--soft);max-width:36ch}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:6px}
+.tiles>div{background:var(--tint);border-radius:10px;padding:12px 14px}
+.tiles b{display:block;font-size:22px;font-weight:800;color:var(--navy);line-height:1.15}
+.tiles span{display:block;font-size:13px;color:var(--soft);line-height:1.35;margin-top:2px}
+.sub{font-size:17px;font-weight:800;color:var(--navy);margin:24px 0 4px}
+.subp{font-size:15px;color:var(--soft);margin:0 0 12px;max-width:70ch}
+/* Q2: AWWA benchmark */
+.bench{display:grid;gap:14px;margin-top:4px}
+.bench>div{display:grid;grid-template-columns:150px 1fr;gap:6px 16px;align-items:center}
+.bench .bl b{display:block;font-size:15px;color:var(--navy)}
+.bench .bl span{display:block;font-size:22px;font-weight:800;line-height:1.15;font-variant-numeric:tabular-nums}
+.bench .bl small{font-size:12.5px;color:var(--soft)}
+.btrk{position:relative;height:34px;border-radius:8px;background:repeating-linear-gradient(135deg,#F2F4F6 0 7px,#E6EAEE 7px 14px)}
+.btrk i{display:flex;align-items:center;justify-content:flex-end;padding-right:10px;height:100%;width:0;border-radius:8px;color:#fff;font-style:normal;font-size:13px;font-weight:700;white-space:nowrap;transition:width 1.2s var(--ease)}
+.btrk::after{content:"";position:absolute;right:0;top:-6px;bottom:-6px;width:3px;border-radius:2px;background:var(--navy)}
+.bench .gap{grid-column:2;font-size:13px;color:var(--soft);margin-top:-2px}
+.bench .gap b{color:var(--green-dk)}
+.bench .industry{grid-column:2;display:flex;justify-content:flex-end;font-size:12px;font-weight:700;color:var(--navy);margin-bottom:-8px}
+.bsrc{font-size:12.5px;color:var(--soft);margin:12px 0 0}
+
+/* Q2: tabs + bill bar */
+#sustain[data-sys=w]{--c:var(--blue);--c2:#9CC4E8;--tint:#F2F7FC}
+#sustain[data-sys=s]{--c:var(--waste);--c2:#B5E0AE;--tint:#F2F8F1}
+.seg{display:inline-flex;background:#EEF2F5;border-radius:999px;padding:4px;margin-bottom:14px}
+.seg button{border:0;background:none;padding:8px 16px;border-radius:999px;font-weight:700;font-size:14px;color:var(--soft);cursor:pointer;transition:background .25s,color .25s}
+.seg button[aria-selected=true]{background:var(--c);color:#fff}
+.swap{animation:swapin .45s var(--ease)}
+.bill{background:#fff;border-radius:10px;padding:16px 16px 12px;margin:0 0 4px}
+.bill h4{font-size:13px;color:var(--soft);font-weight:700;margin:0 0 10px}
+.btrack{position:relative;display:flex;height:40px;border-radius:10px;overflow:hidden;background:#EEF2F5}
+.btrack i{display:flex;align-items:center;height:100%;width:0;font-style:normal;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;transition:width 1.1s var(--ease)}
+.btrack .cost{background:var(--c2);color:var(--navy);padding-left:12px}
+.btrack .left{background:var(--c);transition-delay:.9s}
+.blabels{display:flex;justify-content:space-between;gap:10px;margin-top:8px;font-size:13px;color:var(--soft)}
+.blabels b{color:var(--navy)}
+.blabels .lo b{color:var(--c)}
+
+/* Q3: money bar + rings */
+#growth{--c:var(--green-dk)}
+.coin{display:flex;align-items:center;gap:18px;margin:4px 0 18px;flex-wrap:wrap}
+.coin .c1,.coin .c2{display:grid;place-items:center;border-radius:50%;font-weight:800;color:#fff}
+.coin .c1{width:92px;height:92px;background:var(--navy);font-size:28px}
+.coin .c2{width:68px;height:68px;background:var(--green-dk);font-size:20px;transform:scale(0);transition:transform .6s var(--ease) .3s}
+.rv.in .coin .c2{transform:scale(1)}
+.coin .plus{font-size:26px;font-weight:800;color:var(--slate)}
+.coin p{flex:1 1 220px;margin:0;font-size:15px;color:var(--soft)}
+.coin p b{color:var(--navy)}
+.money{display:flex;height:46px;border-radius:12px;overflow:hidden;background:#EEF2F5;gap:3px}
+.money button{border:0;cursor:pointer;height:100%;width:0;padding:0 12px;text-align:left;color:#fff;font-weight:800;font-size:14px;white-space:nowrap;overflow:hidden;transition:width 1.2s var(--ease),filter .2s}
+.money button:nth-child(1){background:var(--navy)}
+.money button:nth-child(2){background:var(--green-dk);transition-delay:.15s}
+.money button:nth-child(3){background:var(--green);color:#0E2A12;transition-delay:.3s}
+.money button:hover{filter:brightness(1.12)}
+.money button[aria-pressed=true]{box-shadow:inset 0 -5px 0 rgba(255,255,255,.75)}
+.mnote{margin-top:12px;background:var(--green-lt);border-radius:10px;padding:12px 14px;font-size:14.5px;min-height:4.2em}
+.mnote b{color:var(--navy)}
+.rings{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ring{background:var(--green-lt);border-radius:12px;padding:16px 12px 12px;text-align:center}
+.ring svg{width:110px;height:110px;display:block;margin:0 auto 6px}
+.ring circle{fill:none;stroke-width:12}
+.ring .bg{stroke:#fff}
+.ring .fg{stroke-linecap:round;transform:rotate(-90deg);transform-origin:50% 50%;stroke-dasharray:289;stroke-dashoffset:289;transition:stroke-dashoffset 1.4s var(--ease)}
+.ring text{font-size:24px;font-weight:800;fill:var(--navy);text-anchor:middle;dominant-baseline:central}
+.ring b{display:block;font-size:14px;color:var(--navy)}
+.ring span{font-size:12.5px;color:var(--soft);line-height:1.3;display:block}
+
+/* compare */
+#compare{scroll-margin-top:12px}
+.rate{margin-bottom:14px}
+.rate>div:first-child{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:5px;gap:10px}
+.rate>div:first-child b{color:var(--navy)}
+.rate>div:first-child span{color:var(--soft)}
+.rtrack{height:38px;background:#EEF3F7;border-radius:19px;overflow:hidden}
+.rtrack i{display:flex;align-items:center;justify-content:flex-end;padding-right:12px;height:100%;width:0;border-radius:19px;color:#fff;font-style:normal;font-weight:800;font-size:15px;transition:width 1.3s var(--ease);white-space:nowrap}
+.rtrack i.ctub{background:linear-gradient(90deg,var(--navy),var(--blue))}
+.rtrack i.alt{background:linear-gradient(90deg,#9AA6B0,var(--slate));transition-delay:.15s}
+.time{background:var(--green-lt);border-radius:12px;padding:18px 20px;margin-top:18px}
+.time .row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.time .row b{font-size:40px;font-weight:800;color:var(--green-dk);line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-1px}
+.time .row span{font-size:15px}
+.time input{width:100%;margin:14px 0 2px;accent-color:var(--green-dk)}
+.ticks{display:flex;justify-content:space-between;font-size:11.5px;color:var(--soft);padding:0 2px}
+.jars{display:flex;gap:4px;align-items:flex-end;height:52px;margin-top:12px}
+.jars i{flex:1;background:var(--green-dk);border-radius:4px 4px 2px 2px;opacity:.18;transition:opacity .3s,height .4s var(--ease)}
+.jars i.on{opacity:1}
+.mini{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0 10px}
+.mini>div{background:#fff;border-radius:8px;padding:9px 12px}
+.mini b{display:block;font-size:18px;color:#3F4B56;font-weight:800}
+.mini span{font-size:12.5px;color:var(--soft);line-height:1.3;display:block}
+.cmpt{width:100%;border-collapse:collapse;font-size:14px;background:#fff;border-radius:8px;overflow:hidden}
+.cmpt th,.cmpt td{text-align:left;padding:9px 12px;vertical-align:top}
+.cmpt th{font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--soft);background:#F7F9FB}
+.cmpt tr+tr td{border-top:1px solid #EEF2F5}
+.cmpt td:first-child{font-weight:700;color:var(--navy)}
+.tscroll{overflow-x:auto;margin-bottom:10px}
+
+details.src{font-size:12.5px;color:var(--soft);margin-top:18px}
+details.src summary{cursor:pointer;font-weight:700}
+details.src p{margin:8px 0 0;line-height:1.55}
+
+.js .rv{opacity:0;transform:translateY(18px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.js .rv.in{opacity:1;transform:none}
+
+@media (max-width:860px){
+  .hero{grid-template-columns:1fr;padding:28px 22px 22px}
+  .cols{grid-template-columns:1fr;gap:14px}
+  .stats{flex-direction:row;flex-wrap:wrap}
+  .stats>div{flex:1 1 140px}
+  .tiles{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:560px){
+  .bench>div{grid-template-columns:1fr}
+  .bench .gap,.bench .industry{grid-column:1}
+  .wrap{padding:14px 16px 40px}
+  .hero h1{font-size:29px}
+  .nums>div{flex:1 1 50%}
+  .sec{padding:22px 16px}
+  .sh .num{font-size:32px}
+  .sh h2{font-size:20px}
+  .panel{padding:16px 14px}
+  .mbody{padding:0 14px 8px}
+  .big b{font-size:36px}
+  .gzone{display:none}
+  .gmark span{bottom:auto;top:calc(100% + 18px);left:auto;right:-2px;transform:none}
+  .gauge{margin-bottom:50px}
+  .mini{grid-template-columns:1fr 1fr}
+  .time .row b{font-size:32px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+  .js .rv{opacity:1;transform:none}
+  .qs .chk path{stroke-dashoffset:0}
+  .coin .c2{transform:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="top"><span class="draft">DRAFT</span><a class="back" href="CTUB-101.html">&larr; CTUB 101</a></div>
+
+<!-- ============ hero ============ -->
+<header class="card hero">
+  <div>
+    <div class="k">Fiscal year 2025</div>
+    <h1>What it costs to run CTUB, and who pays for it</h1>
+    <p>Every water and sewer system has bills to pay: power, chemicals, pipes, people. This page follows the money for one year and asks three plain questions about it.</p>
+    <div class="nums">
+      <div><b data-to="17534">17,534</b><span>water and sewer accounts</span></div>
+      <div><b data-to="596.4" data-dec="1" data-suf="M">596.4M</b><span>gallons of water produced</span></div>
+      <div><b data-to="473.6" data-dec="1" data-suf="M">473.6M</b><span>gallons of wastewater treated</span></div>
+      <div><b data-to="38">38</b><span>employees</span></div>
+    </div>
+  </div>
+  <nav class="qs" aria-label="The three questions">
+    <div class="lbl">Three questions</div>
+    <a href="#afford"><svg class="chk" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="17"/><path d="M10 17.5l4.5 4.5 9-9"/></svg><div><b>Are rates affordable?</b><span>Yes: 1.63% of a typical household's income</span></div><i>&rarr;</i></a>
+    <a href="#sustain"><svg class="chk" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="17"/><path d="M10 17.5l4.5 4.5 9-9"/></svg><div><b>Do rates cover the cost?</b><span>Yes: both systems end the year above break-even</span></div><i>&rarr;</i></a>
+    <a href="#growth"><svg class="chk" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="17"/><path d="M10 17.5l4.5 4.5 9-9"/></svg><div><b>Are existing customers protected?</b><span>Yes: growth funds 42&ndash;43% of new capital</span></div><i>&rarr;</i></a>
+  </nav>
+</header>
+
+<!-- ============ Q1 affordable ============ -->
+<section class="card sec rv" id="afford">
+  <div class="sh"><div class="num">01</div><div><div class="k">Affordability</div><h2>Are rates affordable?</h2></div></div>
+  <div class="cols">
+    <div>
+      <p class="lead">A common yardstick is the share of a household's income spent on water and sewer. The EPA treats 4.5% or more as a high burden.</p>
+      <div class="big"><b data-to="1.63" data-dec="2" data-suf="%">1.63%</b><span>of median household income goes to CTUB water and sewer, about $1.63 of every $100 earned.</span></div>
+      <div class="gauge" id="gauge" role="img" aria-label="Scale from 0 to 6 percent of income. CTUB water and sewer together reach 1.63 percent: 0.81 water and 0.82 sewer. The EPA high-burden level is 4.5 percent.">
+        <div class="gtrack"><i class="gw" data-w="13.5"></i><i class="gs" data-w="13.67"></i><span class="gzone">High burden</span></div>
+        <div class="gmark"><span>EPA high-burden level 4.5%</span></div>
+        <div class="gpin">CTUB 1.63%</div>
+        <div class="gscale"><span style="left:0">0%</span><span style="left:16.67%">1%</span><span style="left:33.33%">2%</span><span style="left:50%">3%</span><span style="left:66.67%">4%</span><span style="left:83.33%">5%</span><span style="left:100%">6%</span></div>
+      </div>
+      <div class="key">
+        <span><i style="background:var(--blue)"></i>Water 0.81% ($720 a year)</span>
+        <span><i style="background:var(--waste)"></i>Sewer 0.82% ($731 a year)</span>
+        <span><i style="background:#F9E1DE"></i>EPA high-burden zone</span>
+      </div>
+    </div>
+    <div class="stats">
+      <div><b>$1,451</b><span>a year for water and sewer, typical residential customer</span></div>
+      <div><b>$89,263</b><span>median household income, Jefferson County</span></div>
+      <div><b>4.5%</b><span>EPA high-burden level, about 2.8 times CTUB&rsquo;s figure</span></div>
+    </div>
+  </div>
+
+  <h3 class="sub">Is the median a fair measure?</h3>
+  <p class="subp">An average can hide hardship, so the EPA also looks at who is struggling. In Jefferson County, these indicators point the same way.</p>
+  <div class="tiles">
+    <div><b>6.3%</b><span>of families below the poverty line, low by state and national standards</span></div>
+    <div><b>Below avg.</b><span>SNAP food assistance use, compared with WV and the U.S.</span></div>
+    <div><b>&le; U.S. avg.</b><span>unemployment, consistently at or below the national rate</span></div>
+    <div><b>+6.2%</b><span>population growth since 2020, to 61,264 in 2024</span></div>
+  </div>
+  <details class="more">
+    <summary>How this is measured</summary>
+    <div class="mbody">
+      <p>The figure divides the annual residential cost of water and sewer ($1,451) by Jefferson County's median household income ($89,263). This follows the Residential Financial Impact Indicator in the EPA's 2024 Financial Capability Assessment Guidance (Section II.a.1, Exhibit 1), adapted for local benchmarking.</p>
+      <p>The poverty measure is the EPA's Lowest Quintile Poverty Indicator.</p>
+    </div>
+  </details>
+</section>
+
+<!-- ============ Q2 sustainable ============ -->
+<section class="card sec rv" id="sustain" data-sys="w">
+  <div class="sh"><div class="num">02</div><div><div class="k">Sustainability</div><h2>Do rates cover the cost of service?</h2></div></div>
+  <p class="lead">A utility is on solid footing when what customers pay covers what it costs to serve them. The small amount left over is called the operating margin.</p>
+  <div class="seg" role="tablist" aria-label="Which system">
+    <button role="tab" data-sys="w" aria-selected="true">Drinking water</button>
+    <button role="tab" data-sys="s" aria-selected="false">Wastewater</button>
+  </div>
+  <div class="panel" id="sysPanel" aria-live="polite"></div>
+
+  <h3 class="sub">We keep your costs low by keeping our expenses low</h3>
+  <p class="subp">The American Water Works Association compares what utilities across the country spend to serve each customer. CTUB spends less than the industry standard in both systems.</p>
+  <div class="bench" role="img" aria-label="Operating cost per customer per year. Water: $495, 7.2% below the industry standard. Sewer: $413, 11.2% below the industry standard.">
+    <div><span></span><div class="industry">Industry standard</div></div>
+    <div>
+      <div class="bl"><b>Water</b><span style="color:var(--blue)">$495</span><small>per customer, per year</small></div>
+      <div class="btrk"><i data-w="92.8" style="background:var(--blue)">CTUB</i></div>
+      <div class="gap"><b>7.2% below</b> the industry standard</div>
+    </div>
+    <div>
+      <div class="bl"><b>Sewer</b><span style="color:var(--waste)">$413</span><small>per customer, per year</small></div>
+      <div class="btrk"><i data-w="88.8" style="background:var(--waste)">CTUB</i></div>
+      <div class="gap"><b>11.2% below</b> the industry standard</div>
+    </div>
+  </div>
+  <p class="bsrc">Operating cost per customer. Source: AWWA Utility Benchmarking Survey.</p>
+</section>
+
+<!-- ============ Q3 growth ============ -->
+<section class="card sec rv" id="growth">
+  <div class="sh"><div class="num">03</div><div><div class="k">Protecting customers</div><h2>Are existing customers protected as the county grows?</h2></div></div>
+  <p class="lead">Jefferson County is growing, and new homes need new pipes and plant capacity. CTUB collects fees and contributions from new development so that existing customers don't carry that cost alone.</p>
+  <div class="cols">
+    <div>
+      <div class="coin">
+        <span class="c1">$1</span><span class="plus">+</span><span class="c2">54&cent;</span>
+        <p>For every <b>$1 customers pay</b>, CTUB brings in about <b>54 cents more</b> from growth, grants and interest.</p>
+      </div>
+      <div class="money" id="money" role="group" aria-label="Where FY25 money came from. Select a part for details.">
+        <button type="button" data-w="65.1" data-i="0" aria-pressed="true">$12.74M</button>
+        <button type="button" data-w="29.6" data-i="1" aria-pressed="false">$5.78M</button>
+        <button type="button" data-w="5.3" data-i="2" aria-pressed="false" aria-label="$1.04M"></button>
+      </div>
+      <div class="key">
+        <span><i style="background:var(--navy)"></i>Customer bills</span>
+        <span><i style="background:var(--green-dk)"></i>Growth contributions</span>
+        <span><i style="background:var(--green)"></i>Interest and grants</span>
+      </div>
+      <div class="mnote" id="mnote"></div>
+    </div>
+    <div class="rings">
+      <div class="ring"><svg viewBox="0 0 110 110"><circle class="bg" cx="55" cy="55" r="46"/><circle class="fg" cx="55" cy="55" r="46" stroke="var(--blue)" data-p="42"/><text x="55" y="55">42%</text></svg><b>Water</b><span>of new capital paid by growth</span></div>
+      <div class="ring"><svg viewBox="0 0 110 110"><circle class="bg" cx="55" cy="55" r="46"/><circle class="fg" cx="55" cy="55" r="46" stroke="var(--waste)" data-p="43"/><text x="55" y="55">43%</text></svg><b>Sewer</b><span>of new capital paid by growth</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ compare ============ -->
+<section class="card sec rv" id="compare">
+  <div class="sh"><div class="num">04</div><div><div class="k">The alternative</div><h2>What a private utility would charge</h2></div></div>
+  <p class="lead">The main alternative to CTUB is an investor-owned company that sets one rate across 19 counties. At the same household use, the published water rates differ by more than double.</p>
+  <div class="rate">
+    <div><b>CTUB</b><span>Public, locally governed</span></div>
+    <div class="rtrack"><i class="ctub" data-w="45.6">$39.00</i></div>
+  </div>
+  <div class="rate">
+    <div><b>Private alternative</b><span>Investor-owned</span></div>
+    <div class="rtrack"><i class="alt" data-w="100">$85.50</i></div>
+  </div>
+  <p style="font-size:13px;color:var(--soft);margin:0">Monthly residential water bill at 3,000 gallons, published rates. The private rate is 2.2 times CTUB's.</p>
+
+  <div class="time">
+    <div class="row"><b id="saveAmt">$2,790</b><span>saved by a CTUB household over <strong id="saveYrs">5 years</strong></span></div>
+    <input type="range" id="yrs" min="1" max="10" value="5" aria-label="Number of years">
+    <div class="ticks"><span>1 yr</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10 yrs</span></div>
+    <div class="jars" id="jars" aria-hidden="true"></div>
+    <p style="font-size:13px;color:var(--soft);margin:10px 0 0">$46.50 a month, or $558 a year, with no future rate increases assumed on either side. That keeps the estimate conservative: the private utility's residential bill has risen 124% since 2005, and its May 2025 filing sought another 27.9%.</p>
+  </div>
+
+  <details class="more">
+    <summary>The private utility, by the numbers</summary>
+    <div class="mbody">
+      <div class="mini">
+        <div><b>171,799</b><span>customers statewide, +1.6% over 2014&ndash;24</span></div>
+        <div><b>19 counties</b><span>served under one statewide rate</span></div>
+        <div><b>9.8%</b><span>authorized return to shareholders, paid through rates</span></div>
+        <div><b>$40.8M</b><span>net income in 2024, about 5&times; its 2014 level</span></div>
+        <div><b>~67%</b><span>rate increase, 2016&ndash;26</span></div>
+        <div><b>+124%</b><span>residential bill since 2005</span></div>
+      </div>
+      <p>These are statewide figures, not specific to the Eastern Panhandle. The company is a subsidiary of a publicly traded parent.</p>
+    </div>
+  </details>
+  <details class="more">
+    <summary>Side by side</summary>
+    <div class="mbody">
+      <div class="tscroll"><table class="cmpt">
+        <tr><th></th><th>CTUB</th><th>Private alternative</th></tr>
+        <tr><td>Monthly bill, 3,000 gal</td><td>$39.00</td><td>$85.50</td></tr>
+        <tr><td>Annual water cost</td><td>$468</td><td>$1,026</td></tr>
+        <tr><td>Commercial, 30,000 gal</td><td>$345.00</td><td>$570.00</td></tr>
+        <tr><td>Governed by</td><td>Public board appointed by Charles Town City Council</td><td>Investor-owned subsidiary of a publicly traded parent</td></tr>
+        <tr><td>Rates set by</td><td>City Council and the WV PSC, based on local cost of service</td><td>WV PSC, one tariff across 19 counties</td></tr>
+        <tr><td>Return to shareholders</td><td>None; revenue is reinvested in the system</td><td>9.8% authorized return on equity, recovered through rates</td></tr>
+      </table></div>
+    </div>
+  </details>
+  <details class="more">
+    <summary>About this comparison</summary>
+    <div class="mbody">
+      <p>Utilities are usually compared at 3,000 gallons a month using posted rates. That is why CTUB's figure here ($39.00) differs from its $59.98 average water bill, which includes higher-use households.</p>
+      <p>At the 30,000-gallon commercial level, the private rate is about 1.65 times CTUB's. Sewer is left out: the private utility's Jefferson County wastewater operation is one 125,000-gallon-a-day plant serving roughly 181 customers, too small for a fair comparison.</p>
+    </div>
+  </details>
+</section>
+
+<details class="src">
+  <summary>Sources</summary>
+  <p><b>Framework:</b> EPA Clean Water Act Financial Capability Assessment Guidance (March 2024): Residential Financial Impact Indicator (Section II.a.1, Exhibit 1) and utility financing indicators (II.c.1, II.c.4), adapted for local benchmarking. <b>Data:</b> CTUB FY25 operating data. Operating cost per customer benchmarks: AWWA Utility Benchmarking Survey. CTUB rate: General Manager testimony, February 2025 PSC complaint (Case 25-0263-W-C). Comparison rate: West Virginia American Water, March 2026 PSC order, including the $2.00 WSIC surcharge. Private utility benchmarks: statewide figures from PSC rate cases and published reports. Rate history and governance: CPS analysis and the CTUB FAQ working draft.</p>
+</details>
+</div>
+
+<script>
+document.documentElement.classList.add('js');
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// grow bars from empty once they're on the page
+function grow(root){
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    root.querySelectorAll('[data-w]').forEach(el => el.style.width = el.dataset.w + '%');
+    root.querySelectorAll('[data-p]').forEach(el => el.style.strokeDashoffset = 289 * (1 - el.dataset.p / 100));
+  }));
+}
+
+function countUp(el){
+  const to = +el.dataset.to, dec = +(el.dataset.dec || 0), pre = el.dataset.pre || '', suf = el.dataset.suf || '';
+  const t0 = performance.now(), dur = 1200;
+  const tick = t => {
+    const p = Math.max(0, Math.min((t - t0) / dur, 1)), e = 1 - Math.pow(1 - p, 3);
+    el.textContent = pre + (to * e).toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec }) + suf;
+    if (p < 1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
+// Q2: water / wastewater
+const SYS = {
+  w: {
+    bill: 59.98, cost: 57.90, margin: '3.46%',
+    stats: [['596.4M','gallons produced in the year'],['7,473','water customers'],['$8.71','to produce 1,000 gallons, under a penny a gallon']],
+    more: `<p>Customers paid <b>$5.38 million</b> for water service. Running the system cost <b>$5.19 million</b>. Each customer uses about 219 gallons a day.</p>
+      <div class="box"><b>Beyond the bills.</b> Investment income and outside funding added <b>$2.79 million</b>, about $31.06 per customer per month, which goes toward pipes and plant capacity.</div>
+      <p>42% of new capital was paid for by capacity fees and developer contributions.</p>`
+  },
+  s: {
+    bill: 60.95, cost: 59.94, margin: '1.66%',
+    stats: [['473.6M','gallons treated in the year'],['10,061','sewer customers'],['$15.28','to treat 1,000 gallons, about 1.5 cents a gallon']],
+    more: `<p>Customers paid <b>$7.36 million</b> for sewer service. Running the system cost <b>$7.24 million</b>. Each customer sends about 129 gallons a day to treatment.</p>
+      <div class="box"><b>Beyond the bills.</b> Financial management and outside capital added <b>$4.04 million</b>, about $33.42 per customer per month.</div>
+      <p>43% of new capital was paid for by capacity fees and developer contributions.</p>`
+  }
+};
+const sus = document.getElementById('sustain'), sysPanel = document.getElementById('sysPanel');
+function showSys(k){
+  const d = SYS[k], left = (d.bill - d.cost).toFixed(2), costPct = d.cost / d.bill * 100;
+  sus.dataset.sys = k;
+  sus.querySelectorAll('.seg button').forEach(b => b.setAttribute('aria-selected', b.dataset.sys === k));
+  sysPanel.innerHTML = `
+    <div class="cols">
+      <div>
+        <div class="bill">
+          <h4>The average monthly ${k === 'w' ? 'water' : 'sewer'} bill, and where it goes</h4>
+          <div class="btrack"><i class="cost" data-w="${costPct.toFixed(1)}">$${d.cost.toFixed(2)} cost to serve one customer</i><i class="left" data-w="${(100 - costPct).toFixed(1)}"></i></div>
+          <div class="blabels"><span>Average bill <b>$${d.bill.toFixed(2)}</b></span><span class="lo">Left over <b>$${left}</b> (${d.margin} margin)</span></div>
+        </div>
+      </div>
+      <div class="stats">${d.stats.map(x => `<div><b>${x[0]}</b><span>${x[1]}</span></div>`).join('')}</div>
+    </div>
+    <details class="more"><summary>The details</summary><div class="mbody">${d.more}</div></details>`;
+  sysPanel.classList.remove('swap'); void sysPanel.offsetWidth; sysPanel.classList.add('swap');
+  if (sus.classList.contains('in')) grow(sysPanel);
+}
+sus.querySelectorAll('.seg button').forEach(b => b.onclick = () => showSys(b.dataset.sys));
+showSys('w');
+
+// Q3: where the money came from
+const MONEY = [
+  `<b>Customer bills: $12.74 million.</b> What water and sewer customers paid for service in FY25. This covers day-to-day operations.`,
+  `<b>Growth contributions: $5.78 million.</b> Capacity fees and developer contributions paid by new development, used to build the infrastructure that growth requires.`,
+  `<b>Interest and grants: $1.04 million.</b> Interest earnings plus outside grant funding. Together with growth contributions, $6.82 million arrived beyond customer bills.`
+];
+const mnote = document.getElementById('mnote');
+document.querySelectorAll('#money button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('#money button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  mnote.innerHTML = MONEY[b.dataset.i];
+  mnote.classList.remove('swap'); void mnote.offsetWidth; mnote.classList.add('swap');
+});
+mnote.innerHTML = MONEY[0];
+
+// compare: savings over time
+const yrs = document.getElementById('yrs'), jars = document.getElementById('jars');
+for (let y = 1; y <= 10; y++){ const j = document.createElement('i'); j.style.height = (y * 10) + '%'; jars.appendChild(j); }
+function showYrs(){
+  const y = +yrs.value;
+  document.getElementById('saveAmt').textContent = '$' + (558 * y).toLocaleString('en-US');
+  document.getElementById('saveYrs').textContent = y === 1 ? '1 year' : y + ' years';
+  jars.querySelectorAll('i').forEach((j, k) => j.classList.toggle('on', k < y));
+}
+yrs.oninput = showYrs; showYrs();
+
+// scroll reveal, count-ups, bars
+const io = new IntersectionObserver(entries => entries.forEach(en => {
+  if (!en.isIntersecting) return;
+  const el = en.target; io.unobserve(el);
+  el.classList.add('in');
+  if (!reduce) el.querySelectorAll('[data-to]').forEach(countUp);
+  grow(el);
+  if (el.id === 'afford') document.getElementById('gauge').classList.add('on');
+}), { threshold: .15 });
+document.querySelectorAll('.rv, .hero').forEach(el => io.observe(el));
+</script>
+</body>
+</html>

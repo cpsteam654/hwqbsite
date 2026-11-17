@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CTUB 101</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Palette taken from ctubwv.com */
+:root{
+  --navy:#003F75;--navy-dk:#002A50;--blue:#095EA8;--link:#4078A8;--blue-lt:#E8F1F9;
+  --green:#71CB67;--green-dk:#2F7D2A;--green-lt:#E6F5E4;--waste:#3F8F3A;
+  --slate:#7C8B98;--ink:#1B1B1B;--soft:#55626D;--line:#DDE4EA;--page:#EFEFEF;--card:#fff;--red:#B23A2E;
+  --ease:cubic-bezier(.6,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--page);color:var(--ink);font-family:"Open Sans",-apple-system,"Segoe UI",Arial,sans-serif;font-size:16px;line-height:1.55}
+h1,h2,h3,h4{margin:0;line-height:1.2}
+a{color:var(--link)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.ic{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.wrap{max-width:1060px;margin:0 auto;padding:22px 16px 56px}
+.card{background:var(--card);border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 10px 30px -18px rgba(0,40,80,.45);margin-bottom:20px;overflow:hidden}
+.draft{display:inline-block;background:#C8962E;color:#fff;font-size:11px;font-weight:700;letter-spacing:1.6px;border-radius:4px;padding:3px 9px;margin-bottom:12px}
+
+/* ---------- hero ---------- */
+.hero{display:grid;grid-template-columns:1.05fr 1fr;gap:10px;align-items:center;color:#fff;padding:34px 34px 28px;
+  background:radial-gradient(120% 140% at 100% 0%,var(--blue) 0%,var(--navy) 45%,var(--navy-dk) 100%)}
+.hero h1{font-size:40px;font-weight:800;letter-spacing:-.8px;line-height:1.08}
+.hero h1 em{font-style:normal;color:var(--green)}
+.hero p{color:#cfe0f0;font-size:16.5px;margin:14px 0 22px;max-width:44ch}
+.nums{display:flex;flex-wrap:wrap;gap:0;border-top:1px solid rgba(255,255,255,.18)}
+.nums>div{flex:1 1 25%;padding:12px 14px 0 0;min-width:110px}
+.nums b{display:block;font-size:26px;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
+.nums span{font-size:12px;color:#a9c3dc;line-height:1.3;display:block;margin-top:3px}
+.loop{width:100%;height:auto;max-width:460px;justify-self:end}
+.loop a{cursor:pointer}
+.loop .hit{stroke:transparent;stroke-width:34;fill:none}
+.loop .flow{fill:none;stroke-width:7;stroke-linecap:round;stroke-dasharray:3 15;animation:dash 1s linear infinite}
+.loop a:hover .flow,.loop a:focus .flow{stroke-width:9}
+.loop .tag{font-size:13px;font-weight:700;fill:#fff}
+.loop .tag2{font-size:11px;fill:#a9c3dc}
+.loop .hint{font-size:11px;fill:var(--green);font-weight:700;opacity:0;transition:opacity .2s}
+.loop a:hover .hint,.loop a:focus .hint{opacity:1}
+@keyframes dash{to{stroke-dashoffset:-18}}
+.wave{animation:wave 6s ease-in-out infinite alternate}
+@keyframes wave{to{transform:translateX(-24px)}}
+
+/* ---------- journey ---------- */
+#journey{padding:26px 30px 28px;scroll-margin-top:12px}
+#journey[data-sys=w]{--c:var(--blue);--c2:#9CC4E8;--ring:rgba(9,94,168,.16);--tint:#F2F7FC}
+#journey[data-sys=s]{--c:var(--waste);--c2:#B5E0AE;--ring:rgba(63,143,58,.18);--tint:#F2F8F1}
+.jhead{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px}
+.jhead h2{font-size:24px;font-weight:800;color:var(--navy);letter-spacing:-.3px;margin-right:auto}
+.jhead h2 small{display:block;font-size:14px;font-weight:600;color:var(--soft);letter-spacing:0;margin-top:2px}
+.seg{display:inline-flex;background:#EEF2F5;border-radius:999px;padding:4px}
+.seg button{border:0;background:none;padding:8px 16px;border-radius:999px;font-weight:700;font-size:14px;color:var(--soft);cursor:pointer;transition:background .25s,color .25s}
+.seg button[aria-selected=true]{background:var(--c);color:#fff}
+.playbtn{border:1.5px solid var(--c);background:#fff;color:var(--c);border-radius:999px;padding:7px 15px;font-weight:700;font-size:13.5px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.playbtn:hover{background:var(--tint)}
+.playbtn.on{background:var(--c);color:#fff}
+
+.track{position:relative;display:grid;grid-template-columns:repeat(6,1fr);margin:34px 0 6px}
+.pipe{position:absolute;left:8.333%;right:8.333%;top:27px;height:8px;border-radius:4px;background:#E6ECF1}
+.pipe i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:4px;
+  background:repeating-linear-gradient(90deg,var(--c) 0 16px,var(--c2) 16px 28px);animation:flow 1s linear infinite;transition:width .8s var(--ease)}
+@keyframes flow{to{background-position:28px 0}}
+.marker{position:absolute;top:-24px;left:8.333%;width:20px;height:20px;margin-left:-10px;color:var(--c);transition:left .8s var(--ease);z-index:2}
+.marker svg{width:20px;height:20px;fill:currentColor;stroke:none;animation:bob 1.4s ease-in-out infinite alternate}
+@keyframes bob{to{transform:translateY(-4px)}}
+.node{position:relative;z-index:1;align-self:start;background:none;border:0;padding:0 4px 6px;cursor:pointer;text-align:center;border-radius:10px}
+.node .dot{width:62px;height:62px;margin:0 auto 8px;border-radius:50%;background:#fff;border:3px solid #D5DEE6;display:grid;place-items:center;color:#9AA7B2;font-size:26px;transition:transform .3s var(--ease),background .3s,border-color .3s,color .3s,box-shadow .3s}
+.node:hover .dot{border-color:var(--c);color:var(--c)}
+.node.done .dot{border-color:var(--c);color:var(--c)}
+.node.on .dot{background:var(--c);border-color:var(--c);color:#fff;transform:scale(1.1);box-shadow:0 0 0 7px var(--ring)}
+.node b{display:block;font-size:14px;color:var(--navy);line-height:1.2}
+.node span.sub{display:block;font-size:12px;color:var(--soft);line-height:1.3;margin-top:2px}
+.node:not(.on):not(.done) b{color:var(--soft)}
+
+.panel{margin-top:14px;background:var(--tint);border-radius:12px;padding:22px 24px 18px}
+.panel.swap{animation:swapin .45s var(--ease)}
+@keyframes swapin{from{opacity:0;transform:translateY(10px)}}
+.ph{display:flex;gap:16px;align-items:flex-start;margin-bottom:12px}
+.ph .num{font-size:40px;font-weight:800;line-height:.9;color:var(--c);font-variant-numeric:tabular-nums;letter-spacing:-1px}
+.ph .num small{font-size:15px;color:var(--slate);font-weight:700;letter-spacing:0}
+.ph .k{font-size:12px;letter-spacing:1.3px;text-transform:uppercase;font-weight:700;color:var(--c)}
+.ph h3{font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-.3px;margin-top:2px}
+.pb{display:grid;grid-template-columns:1fr 230px;gap:26px}
+.pb p{margin:0 0 12px}
+.lead{font-size:16.5px}
+.stats{display:flex;flex-direction:column;gap:12px}
+.stats>div{background:#fff;border-radius:10px;padding:10px 14px;animation:pop .5s var(--ease) backwards}
+.stats>div:nth-child(2){animation-delay:.08s}
+.stats>div:nth-child(3){animation-delay:.16s}
+@keyframes pop{from{opacity:0;transform:translateX(10px)}}
+.stats b{display:block;font-size:24px;font-weight:800;color:var(--c);line-height:1.1}
+.stats span{font-size:13px;color:var(--soft);line-height:1.35;display:block}
+.more{margin-top:16px;background:#fff;border-radius:10px}
+.more summary{cursor:pointer;list-style:none;padding:12px 16px;font-weight:700;font-size:14px;color:var(--c);display:flex;align-items:center;gap:8px;border-radius:10px}
+.more summary:hover{background:rgba(0,63,117,.04)}
+.more summary::-webkit-details-marker{display:none}
+.more summary::before{content:"+";display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--c);color:#fff;font-size:15px;line-height:1;transition:transform .25s}
+.more[open] summary::before{transform:rotate(45deg)}
+.more[open] .mbody{animation:swapin .35s var(--ease)}
+.mbody{font-size:15px;padding:0 16px 6px 44px}
+.mbody p{margin:0 0 10px}
+.mbody .box,.mbody .nut{background:var(--tint);border-radius:8px;padding:10px 14px;margin:0 0 10px}
+.pnav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
+.pnav button{border:0;background:none;cursor:pointer;font-weight:700;font-size:14px;color:var(--soft);padding:6px 2px}
+.pnav button.next{background:var(--c);color:#fff;border-radius:999px;padding:8px 18px}
+.pnav button.next:hover{filter:brightness(1.1)}
+.pnav button:disabled{visibility:hidden}
+
+/* viz: comparison */
+.cmp{background:#fff;border-radius:10px;padding:14px 16px;margin:4px 0 12px}
+.cmp-row{display:grid;grid-template-columns:1fr 84px;gap:4px 12px;align-items:center;margin-bottom:10px}
+.cmp-row:last-child{margin-bottom:0}
+.cmp-row>span{grid-column:1/-1;font-size:13px;color:var(--soft);font-weight:600}
+.cmp-tr{height:16px;background:#EEF2F5;border-radius:8px;overflow:hidden}
+.cmp-tr i,.bar i{display:block;height:100%;width:0;border-radius:8px;background:var(--c2);transition:width 1.2s var(--ease)}
+.cmp-tr i.me{background:var(--c);min-width:4px}
+.cmp-row b{font-size:14px;color:var(--navy);text-align:right}
+/* viz: process strip */
+.proc{background:#fff;border-radius:10px;padding:12px;margin:4px 0 12px}
+.proc-steps{display:flex;gap:6px;flex-wrap:wrap}
+.proc-steps button{flex:1 1 0;min-width:84px;border:1.5px solid var(--line);background:#fff;border-radius:8px;padding:7px 6px;cursor:pointer;font-size:12.5px;font-weight:700;color:var(--soft);position:relative;overflow:hidden;transition:border-color .2s,color .2s}
+.proc-steps button i{font-style:normal;display:block;font-size:11px;color:var(--slate)}
+.proc-steps button.on{border-color:var(--c);color:var(--navy)}
+.proc-steps button.on::after{content:"";position:absolute;left:0;bottom:0;height:3px;background:var(--c);animation:fill var(--t,2.6s) linear forwards}
+.proc.paused .proc-steps button.on::after{animation:none;width:100%}
+@keyframes fill{from{width:0}to{width:100%}}
+.proc-desc{font-size:14.5px;margin:10px 4px 2px;min-height:2.9em}
+.proc-desc b{color:var(--navy)}
+/* viz: tanks */
+.tanks{background:#fff;border-radius:10px;padding:14px 16px;margin:4px 0 12px;display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
+.tk{display:flex;gap:8px;align-items:flex-end}
+.tk span{width:30px;height:46px;border:2.5px solid var(--c);border-radius:8px 8px 4px 4px;position:relative;overflow:hidden;background:#fff}
+.tk span:nth-child(odd){height:56px}
+.tk span i{position:absolute;left:0;right:0;bottom:0;height:0;background:var(--c2);transition:height 1s var(--ease)}
+.tanks p{margin:0;font-size:13.5px;color:var(--soft);flex:1 1 160px}
+.tanks p b{color:var(--navy);font-size:15px}
+/* viz: route */
+.route{background:#fff;border-radius:10px;padding:16px 16px 12px;margin:4px 0 12px}
+.rline{position:relative;display:flex;justify-content:space-between;margin:0 6px}
+.rline::before{content:"";position:absolute;left:0;right:0;top:6px;height:3px;background:repeating-linear-gradient(90deg,var(--c2) 0 8px,transparent 8px 13px)}
+.rline .stop{position:relative;width:15px;height:15px;border-radius:50%;background:#fff;border:3px solid var(--c)}
+.rline .stop:last-child{background:var(--navy);border-color:var(--navy)}
+.rline .boat{position:absolute;top:1px;left:0;width:13px;height:13px;border-radius:50%;background:var(--c);box-shadow:0 0 0 4px var(--ring);animation:sail 5s var(--ease) infinite}
+@keyframes sail{0%{left:0;opacity:0}8%{opacity:1}88%{opacity:1}100%{left:calc(100% - 13px);opacity:0}}
+.rnames{display:flex;justify-content:space-between;gap:4px;margin-top:8px;font-size:12px;font-weight:700;color:var(--navy);text-align:center}
+.rnames span{flex:1}
+.rnames span:first-child{text-align:left}
+.rnames span:last-child{text-align:right}
+/* viz: nutrient bars */
+.nut{background:#fff;border-radius:10px;padding:14px 16px;margin:0 0 12px}
+.nut h5{margin:0 0 10px;font-size:13px;color:var(--soft)}
+.nrow{display:grid;grid-template-columns:86px 1fr 46px;gap:10px;align-items:center;margin-bottom:8px;font-size:13.5px}
+.nrow>b{color:var(--navy)}
+.nrow>em{font-style:normal;font-weight:800;color:var(--green-dk);text-align:right;font-size:16px}
+.bar{position:relative;height:22px;border-radius:11px;background:repeating-linear-gradient(135deg,#F2F4F6 0 7px,#E6EAEE 7px 14px)}
+.bar i{background:linear-gradient(90deg,var(--green),var(--waste));border-radius:11px;color:#fff;font-style:normal;font-size:12px;font-weight:700;display:flex;align-items:center;padding-left:10px;white-space:nowrap;overflow:hidden}
+.bar::after{content:"cap";position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10.5px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.6px}
+.nkey{font-size:12px;color:var(--soft);margin:6px 0 0}
+
+/* ---------- oversight + cost ---------- */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.duo .card{margin:0;padding:24px 26px}
+.duo h2{font-size:21px;font-weight:800;color:var(--navy);letter-spacing:-.2px}
+.duo h2+p{margin:4px 0 16px;color:var(--soft);font-size:14px}
+#oversight,#cost{scroll-margin-top:12px}
+.org{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.org button{display:flex;align-items:center;gap:10px;text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:10px 12px;cursor:pointer;font-weight:700;font-size:13.5px;color:var(--navy);line-height:1.25;transition:border-color .2s,background .2s}
+.org button .ic{font-size:20px;color:var(--slate);transition:color .2s}
+.org button:hover{border-color:var(--link)}
+.org button[aria-pressed=true]{border-color:var(--navy);background:var(--navy);color:#fff}
+.org button[aria-pressed=true] .ic{color:var(--green)}
+.orgnote{margin-top:12px;background:var(--blue-lt);border-radius:10px;padding:12px 14px;font-size:14.5px;min-height:4.4em}
+.orgnote.swap{animation:swapin .35s var(--ease)}
+.chain{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:6px;font-size:12.5px;font-weight:700}
+.chain span{background:#fff;border-radius:999px;padding:2px 10px;color:var(--navy)}
+.chain s{text-decoration:none;color:var(--slate)}
+
+.rate{margin-bottom:14px}
+.rate>div:first-child{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:5px}
+.rate>div:first-child b{color:var(--navy)}
+.rate>div:first-child span{color:var(--soft)}
+.rtrack{height:34px;background:#EEF3F7;border-radius:17px;overflow:hidden}
+.rtrack i{display:flex;align-items:center;justify-content:flex-end;padding-right:12px;height:100%;width:0;border-radius:17px;color:#fff;font-style:normal;font-weight:800;font-size:15px;transition:width 1.3s var(--ease);white-space:nowrap}
+.rtrack i.ctub{background:linear-gradient(90deg,var(--navy),var(--blue))}
+.rtrack i.alt{background:linear-gradient(90deg,#9AA6B0,var(--slate));transition-delay:.15s}
+.save{display:flex;align-items:center;gap:14px;background:var(--green-lt);border-radius:10px;padding:12px 16px;margin-top:6px}
+.save b{font-size:34px;font-weight:800;color:var(--green-dk);line-height:1;font-variant-numeric:tabular-nums}
+.save span{font-size:14px;line-height:1.35}
+.save a{font-weight:700;color:var(--navy);white-space:nowrap}
+
+details.src{font-size:12.5px;color:var(--soft);margin-top:18px}
+details.src summary{cursor:pointer;font-weight:700}
+details.src p{margin:8px 0 0;line-height:1.55}
+
+/* scroll reveal (only when JS is running) */
+.js .rv{opacity:0;transform:translateY(18px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.js .rv.in{opacity:1;transform:none}
+
+@media (max-width:860px){
+  .hero{grid-template-columns:1fr;padding:28px 22px 20px}
+  .loop{justify-self:center;max-width:400px}
+  .pb{grid-template-columns:1fr;gap:14px}
+  .stats{flex-direction:row;flex-wrap:wrap}
+  .stats>div{flex:1 1 140px}
+  .duo{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .mbody{padding:0 14px 6px}
+  .wrap{padding:14px 16px 40px}
+  .hero h1{font-size:30px}
+  .nums>div{flex:1 1 50%}
+  #journey{padding:20px 16px}
+  .jhead h2{font-size:20px}
+  .track{margin-top:30px}
+  .node .dot{width:42px;height:42px;font-size:18px;border-width:2.5px}
+  .node.on .dot{box-shadow:0 0 0 4px var(--ring)}
+  .pipe{top:17px;height:6px}
+  .node b,.node span.sub{display:none}
+  .panel{padding:18px 16px 14px}
+  .ph .num{font-size:32px}
+  .ph h3{font-size:19px}
+  .duo .card{padding:20px 16px}
+  .org{grid-template-columns:1fr}
+  .rnames{font-size:10.5px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+  .js .rv{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-people" viewBox="0 0 24 24"><path d="M16 20v-1.5a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4V20"/><circle cx="9" cy="7.5" r="3.6"/><path d="M22 20v-1.5a4 4 0 0 0-3-3.85M16 3.6a3.8 3.8 0 0 1 0 7.4"/></symbol>
+  <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 2.8s-6.5 7-6.5 11.7a6.5 6.5 0 0 0 13 0C18.5 9.8 12 2.8 12 2.8z"/></symbol>
+  <symbol id="i-waves" viewBox="0 0 24 24"><path d="M2 7c2.5-2 4.5-2 7 0s4.5 2 7 0 4.5-2 6 0M2 12.5c2.5-2 4.5-2 7 0s4.5 2 7 0 4.5-2 6 0M2 18c2.5-2 4.5-2 7 0s4.5 2 7 0 4.5-2 6 0"/></symbol>
+  <symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 3v18M7 21h10M4 7h16M4 7l-2.5 6a3.5 3.5 0 0 0 5 0L4 7zM20 7l-2.5 6a3.5 3.5 0 0 0 5 0L20 7z"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+  <symbol id="i-river" viewBox="0 0 24 24"><path d="M3 6.5c3 0 3 2 6 2s3-2 6-2 3 2 6 2M3 12c3 0 3 2 6 2s3-2 6-2 3 2 6 2M3 17.5c3 0 3 2 6 2s3-2 6-2 3 2 6 2"/></symbol>
+  <symbol id="i-intake" viewBox="0 0 24 24"><path d="M3 4h18l-7 8v6l-4 2v-8z"/></symbol>
+  <symbol id="i-plant" viewBox="0 0 24 24"><path d="M3 21V10l5 3v-3l5 3v-3l5 3V4h3v17z"/><path d="M7 17h2M12 17h2M17 17h1"/></symbol>
+  <symbol id="i-tower" viewBox="0 0 24 24"><path d="M6.5 3h11L16 9H8z"/><path d="M9.5 9 7.5 21M14.5 9l2 12M8.5 15h7"/></symbol>
+  <symbol id="i-network" viewBox="0 0 24 24"><circle cx="5" cy="6" r="2.2"/><circle cx="19" cy="6" r="2.2"/><circle cx="12" cy="18" r="2.2"/><path d="M7.2 6h9.6M6.2 8l4.7 8.1M17.8 8l-4.7 8.1"/></symbol>
+  <symbol id="i-tap" viewBox="0 0 24 24"><path d="M3 9h10a4 4 0 0 1 4 4v1.5M3 6v6M8 6V3.5M5 3.5h6"/><path d="M18.5 19c0 1-.7 2-1.5 2s-1.5-1-1.5-2 1.5-2.8 1.5-2.8 1.5 1.8 1.5 2.8z"/></symbol>
+  <symbol id="i-drain" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 9h8M7 12h10M8 15h8"/></symbol>
+  <symbol id="i-pipe" viewBox="0 0 24 24"><path d="M2 7h12a6 6 0 0 1 6 6v8M2 13h9a3 3 0 0 1 3 3v5"/></symbol>
+  <symbol id="i-pump" viewBox="0 0 24 24"><circle cx="10" cy="14" r="6"/><path d="M10 11v3l2 2M16 14h6M10 8V4M7 4h6"/></symbol>
+  <symbol id="i-basin" viewBox="0 0 24 24"><ellipse cx="12" cy="9" rx="9" ry="4.5"/><path d="M3 9v6c0 2.5 4 4.5 9 4.5s9-2 9-4.5V9"/><path d="M8 9c1.3-1 2.7-1 4 0s2.7 1 4 0"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19C5 11 10 5 20 4c-1 10-7 15-15 15z"/><path d="M5 19l8-8"/></symbol>
+</svg>
+
+<div class="wrap">
+<span class="draft">DRAFT</span>
+
+<!-- ============ hero ============ -->
+<header class="card hero">
+  <div>
+    <h1>Where your water comes from. <em>Where it goes.</em></h1>
+    <p>CTUB runs two systems that meet at your house. One brings clean water in. The other takes used water away, cleans it, and gives it back to the river.</p>
+    <div class="nums">
+      <div><b data-to="18000" data-pre="~">~18,000</b><span>residents served</span></div>
+      <div><b data-to="1.66" data-dec="2" data-suf="M">1.66M</b><span>gallons of drinking water a day</span></div>
+      <div><b data-to="3.57" data-dec="2" data-suf="M">3.57M</b><span>gallons in storage</span></div>
+      <div><b>1998</b><span>locally run since</span></div>
+    </div>
+  </div>
+
+  <svg class="loop" viewBox="0 0 420 250" role="img" aria-label="The loop: clean water comes up from the river to your home, used water goes back down to the river">
+    <defs><clipPath id="rc"><rect x="0" y="196" width="420" height="54" rx="12"/></clipPath></defs>
+    <g clip-path="url(#rc)">
+      <path class="wave" d="M-30 206c25-8 45-8 70 0s45 8 70 0 45-8 70 0 45 8 70 0 45-8 70 0 45 8 70 0 45-8 70 0v60H-30z" fill="#7FB2E0" fill-opacity=".35"/>
+      <path class="wave" style="animation-duration:8s" d="M-30 220c25-7 45-7 70 0s45 7 70 0 45-7 70 0 45 7 70 0 45-7 70 0 45 7 70 0 45-7 70 0v50H-30z" fill="#7FB2E0" fill-opacity=".35"/>
+    </g>
+    <text x="210" y="240" text-anchor="middle" class="tag2">SHENANDOAH RIVER</text>
+    <!-- house -->
+    <g stroke="#fff" stroke-width="3" fill="none" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M178 76 210 48l32 28"/><path d="M186 70v38h48V70"/><path d="M203 108V90h14v18"/>
+    </g>
+    <text x="210" y="128" text-anchor="middle" class="tag2">YOUR HOME</text>
+    <!-- water in -->
+    <a href="#journey" data-go="w" aria-label="Follow clean water to your tap">
+      <path class="hit" d="M80 200C58 130 110 84 172 88"/>
+      <path class="flow" stroke="#9CC4E8" d="M80 200C58 130 110 84 172 88"/>
+      <text x="26" y="62" class="tag">Clean water in</text>
+      <text x="26" y="77" class="hint">Follow it &rarr;</text>
+    </a>
+    <!-- water out -->
+    <a href="#journey" data-go="s" aria-label="Follow used water back to the river">
+      <path class="hit" d="M248 88C310 84 362 130 340 200"/>
+      <path class="flow" stroke="#A8E29F" d="M248 88C310 84 362 130 340 200"/>
+      <text x="394" y="62" text-anchor="end" class="tag">Used water out</text>
+      <text x="394" y="77" text-anchor="end" class="hint">Follow it &rarr;</text>
+    </a>
+  </svg>
+</header>
+
+<!-- ============ journey ============ -->
+<section class="card rv" id="journey" data-sys="w">
+  <div class="jhead">
+    <h2 id="jtitle">Follow the water<small id="jsub">Tap a stop, or press play.</small></h2>
+    <div class="seg" role="tablist" aria-label="Which system">
+      <button role="tab" data-sys="w" aria-selected="true">To your tap</button>
+      <button role="tab" data-sys="s" aria-selected="false">Down the drain</button>
+    </div>
+    <button class="playbtn" type="button" id="play"><svg class="ic" style="fill:currentColor;stroke:none"><use href="#i-play"/></svg><span>Play the trip</span></button>
+  </div>
+  <div class="track" id="track">
+    <div class="pipe"><i></i></div>
+    <div class="marker" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.8s-6.5 7-6.5 11.7a6.5 6.5 0 0 0 13 0C18.5 9.8 12 2.8 12 2.8z"/></svg></div>
+  </div>
+  <div class="panel" id="panel" aria-live="polite"></div>
+</section>
+
+<!-- ============ oversight + cost ============ -->
+<div class="duo">
+  <section class="card rv" id="oversight">
+    <h2>Who's in charge</h2>
+    <p>Run locally, checked by the state. Tap one.</p>
+    <div class="org" id="org">
+      <button type="button" data-i="0" aria-pressed="true"><svg class="ic"><use href="#i-people"/></svg>Charles Town City Council</button>
+      <button type="button" data-i="1" aria-pressed="false"><svg class="ic"><use href="#i-scale"/></svg>WV Public Service Commission</button>
+      <button type="button" data-i="2" aria-pressed="false"><svg class="ic"><use href="#i-drop"/></svg>WV Department of Health</button>
+      <button type="button" data-i="3" aria-pressed="false"><svg class="ic"><use href="#i-waves"/></svg>WV Dept. of Environmental Protection</button>
+    </div>
+    <div class="orgnote" id="orgnote"></div>
+  </section>
+
+  <section class="card rv" id="cost">
+    <h2>What it costs you</h2>
+    <p>Monthly residential water bill at 3,000 gallons, published tariff rates.</p>
+    <div class="rate">
+      <div><b>CTUB</b><span>Public, locally governed</span></div>
+      <div class="rtrack"><i class="ctub" data-w="45.6">$39.00</i></div>
+    </div>
+    <div class="rate">
+      <div><b>The private alternative</b><span>Investor-owned</span></div>
+      <div class="rtrack"><i class="alt" data-w="100">$85.50</i></div>
+    </div>
+    <div class="save">
+      <b data-to="558" data-pre="$">$558</b>
+      <span>a year back in a CTUB household's pocket ($46.50 a month). <a href="CTUB-Operations-Dashboard.html#compare">Full comparison &rarr;</a></span>
+    </div>
+  </section>
+</div>
+
+<details class="src">
+  <summary>Sources</summary>
+  <p>CTUB 2025 and 2024 Water Quality Reports; CTUB Source Water Protection Plan, 2024 update (including the 2022 Water System Facility Plan Update); 2020 Water System Model Report; 2022 Sewer Facility Plan; 2024&ndash;2027 Sewer Strategic Plan; CTUB FY2025 audit; EPA ECHO record for permit WV0022349. Rates: General Manager testimony, February 2025 PSC complaint (Case 25-0263-W-C); West Virginia American Water, March 2026 PSC order, including the $2.00 WSIC surcharge.</p>
+</details>
+</div>
+
+<script>
+document.documentElement.classList.add('js');
+const I = n => `<svg class="ic"><use href="#i-${n}"/></svg>`;
+
+const SYS = {
+  w: {
+    title: 'Follow the water to your tap',
+    steps: [
+      { ic:'river', name:'The river', sub:'Shenandoah', k:'The source',
+        h:'The Shenandoah River supplies the main system',
+        lead:`All water in CTUB's main system is drawn from the Shenandoah River. Even at its lowest recorded flow, in July 1930, the river carried about 126 million gallons a day.`,
+        viz:'compare',
+        stats:[['126M gal','river flow on its driest recorded day'],['1.66M gal','what CTUB produces on an average day'],['2024','source protection plan updated']],
+        more:`<p>Protecting the river protects the water supply. CTUB's Source Water Protection Plan maps the land that drains toward the intake and tracks potential risks upstream, including a boat ramp, a railroad crossing, septic systems and construction runoff.</p>` },
+      { ic:'intake', name:'Intake', sub:'Screened, pumped', k:'Intake',
+        h:'A screen on the riverbed, then a long push uphill',
+        lead:`Water enters through a 24-inch stainless steel screen sitting just above the river bottom. It runs about 560 feet under the riverbed to a pump station, and two 125-horsepower pumps send it 7,400 feet to the plant.`,
+        stats:[['4.7M gal','a day of intake capacity'],['2 × 125 hp','raw water pumps'],['24/7','river monitoring since 2020']],
+        more:`<p>Bursts of air clear leaves and debris from the screen, as often as every few minutes when the river is muddy.</p>
+          <div class="box"><b>Early warning.</b> A panel at the intake checks the river around the clock for temperature, pH, dissolved oxygen, turbidity and oil. State and interstate agencies alert CTUB to upstream spills, and operators can shut the intake from the plant.</div>` },
+      { ic:'plant', name:'Treatment', sub:'Cleaned, disinfected', k:'Treatment',
+        h:'Six stages, every gallon',
+        lead:`The Charles Town Water Treatment Plant opened in 1990. Its flocculation, settling and pumping equipment was rebuilt in 2016. It can treat 3 million gallons a day.`,
+        proc:[['Mix','A coagulant is added, causing fine particles to begin clumping together.'],['Flocculate','Paddles stir gently for about 30 minutes, forming larger clumps called "floc."'],['Settle','Over about two hours in basins with inclined plates, the floc settles out.'],['Filter','Four multimedia filters remove the remaining particles.'],['Disinfect','Chlorine and chloramine kill germs and continue protecting water in the pipes.'],['Finish','Fluoride is added for dental health, along with pH and corrosion control to protect pipes.']],
+        stats:[['3.0M gal','a day of treatment capacity'],['1.66M gal','average day'],['1M gal','finished-water tank at the plant']],
+        more:`<p>Finished water rests in a 1-million-gallon tank at the plant to complete disinfection. Two 150-horsepower pumps then send it into the distribution system.</p>` },
+      { ic:'tower', name:'Storage', sub:'Seven tanks', k:'Storage',
+        h:'Seven tanks, about two days of water',
+        lead:`If the river intake had to close, the tanks around the system could meet roughly two days of average demand. Elevated tanks also keep pressure steady during the busiest hours of the day.`,
+        viz:'tanks',
+        stats:[['7','storage tanks'],['3.57M gal','of treated water stored'],['~2 days','of average demand']],
+        more:`<p>They include the Route 9 elevated tank and tanks at Huntfield, 6th Avenue, Avis Street and the Northern High zone.</p>` },
+      { ic:'network', name:'Distribution', sub:'Three pressure zones', k:'Distribution',
+        h:'80 miles of pipe under your feet',
+        lead:`Mains carry water across three pressure zones: the main system, the Northern High zone in Ranson, and Huntfield. Booster stations lift it up to the higher ground.`,
+        stats:[['80+ miles','of water main'],['3','pressure zones'],['2','booster stations']],
+        more:`<p>The boosters are on Burns Street and Augustine Avenue. Backup generators at the intake, the plant and both boosters keep water moving when the power goes out.</p>` },
+      { ic:'tap', name:'Your tap', sub:'Tested all the way', k:'Your tap',
+        h:'Tested the whole way to your faucet',
+        lead:`CTUB serves 7,473 water accounts in Charles Town, Ranson and central Jefferson County. A 2024 inventory found no lead service lines, on either the public or the private side.`,
+        stats:[['7,473','water accounts'],['15+','bacteria samples a month'],['0','lead service lines found']],
+        more:`<p>Testing continues after water leaves the plant, with disinfection byproduct checks every quarter and lead and copper sampling at 30 homes every year. Results are published annually in the <a href="https://ctubwv.com/information/reports/water-documents/consumer-confidence-reports/" target="_blank" rel="noopener">Water Quality Report</a>.</p>
+          <div class="box"><b>Two small systems, too.</b> CTUB also runs Glen Haven and Cavaland, two small well-fed systems with their own annual reports.</div>` }
+    ]
+  },
+  s: {
+    title: 'Follow it down the drain',
+    steps: [
+      { ic:'drain', name:'Your drain', sub:'Sinks, showers, toilets', k:'Your drain',
+        h:'Everything that goes down the drain',
+        lead:`Water from sinks, showers, toilets and washing machines flows into CTUB's collection system. The sewer system serves more customers than the water system, with 10,061 accounts.`,
+        stats:[['10,061','sewer accounts'],['2018','Ranson system joined'],['2019','Jefferson County PSD joined']],
+        more:`<p>Rates were equalized across the whole sewer service area in 2024.</p>
+          <div class="box"><b>What doesn't belong in the sewer.</b> Fats, oils and grease clog pipes. Rainwater from roof or yard drains connected to the sewer overloads the system during storms; CTUB uses smoke testing to locate those connections.</div>` },
+      { ic:'pipe', name:'Collection', sub:'Gravity lines', k:'Collection',
+        h:'Gravity carries most of the flow',
+        lead:`Most wastewater travels through 110 miles of gravity sewer, moving downhill without pumps. With no motors to fail, gravity lines are CTUB's first choice wherever the terrain allows.`,
+        stats:[['110 miles','of gravity sewer'],['Up to 24 in.','gravity main']] },
+      { ic:'pump', name:'Pumping', sub:'Where gravity can\'t', k:'Pumping',
+        h:'Where the land slopes the wrong way, pumps take over',
+        lead:`Pump stations push wastewater through pressurized pipes called force mains.`,
+        stats:[['45','pump stations'],['27 miles','of force main'],['2','old stations retired in 2023']],
+        more:`<p>Sewer gases gradually corrode older stations, so CTUB has been replacing several with gravity lines. Hale Road and County Green closed in 2023. The Huntfield transfer station can send flow to either main plant.</p>` },
+      { ic:'basin', name:'Treatment', sub:'Microbes and UV', k:'Treatment',
+        h:'Biological treatment and UV disinfection',
+        lead:`The main plant on Route 115 is permitted for 1.75 million gallons a day, enough for about 17,500 people. No chlorine is added at the end.`,
+        proc:[['Screen','Bar screens remove rags, plastics and other debris.'],['Grit','Sand and gravel settle out, then are washed and hauled away.'],['Microbes','In three sequencing batch reactors, microorganisms consume organic waste through cycles of aeration and settling.'],['Phosphorus','Chemicals bind phosphorus so it settles out with the solids.'],['Equalize','A holding tank evens out the flow before final treatment.'],['UV','Ultraviolet light inactivates bacteria. No chlorine is added.']],
+        stats:[['1.75M gal','a day permitted capacity'],['3','batch reactor trains'],['$12M','plant renewal, FY2025']],
+        more:`<p>The $12 million renewal, in service in fiscal year 2025, replaced the headworks screens, pumps, UV system, controls and electrical building, and added centrifuges for drying solids.</p>
+          <div class="box"><b>Tuscawilla plant.</b> Treats up to 0.5 million gallons a day with biological nutrient removal and membrane filtration. Much of its treated water is reused to irrigate the Locust Hill golf course.</div>
+          <div class="box"><b>Deerfield.</b> A small neighborhood system off Route 480 that uses recirculating sand filters and returns water to the ground through subsurface fields.</div>` },
+      { ic:'river', name:'Back to the river', sub:'Bound for the Bay', k:'Back to the river',
+        h:'Treated water returns to Evitts Run',
+        lead:`Treated water from the Charles Town plant enters Evitts Run, which joins the Shenandoah about 4.5 miles downstream. From there it flows to the Potomac and on to the Chesapeake Bay.`,
+        viz:'route',
+        stats:[['~40%','of the nitrogen cap used'],['~38%','of the phosphorus cap used'],['WV0022349','discharge permit']],
+        more:`<p>Because it all ends up in the Chesapeake Bay, state permits cap how much nitrogen and phosphorus the main plants can release each year.</p>
+          <div class="nut"><h5>Released vs. annual cap, both main plants, 2022&ndash;23</h5>
+            <div class="nrow"><b>Nitrogen</b><div class="bar"><i data-w="40">17,127 lb</i></div><em>40%</em></div>
+            <div class="nrow"><b>Phosphorus</b><div class="bar"><i data-w="38">2,036 lb</i></div><em>38%</em></div>
+            <p class="nkey">Caps: 42,855 lb nitrogen; 5,367 lb phosphorus.</p></div>` },
+      { ic:'leaf', name:'Biosolids', sub:'Back to the land', k:'Biosolids',
+        h:'What\'s left goes back to the land',
+        lead:`Solids pulled out during treatment are broken down in aerobic digesters, dried, and have been used as fertilizer on farms permitted by the WV Department of Environmental Protection.`,
+        stats:[['Aerobic','digestion'],['Centrifuge','dewatering'],['2025','PFAS policy adopted']],
+        more:`<p>That includes solids from the Tuscawilla plant and the water treatment plant. In 2025 the Board adopted a PFAS policy covering water, wastewater and biosolids.</p>` }
+    ]
+  }
+};
+
+const VIZ = {
+  compare: () => `<div class="cmp">
+      <div class="cmp-row"><span>The river on its driest recorded day</span><div class="cmp-tr"><i data-w="100"></i></div><b>126M gal</b></div>
+      <div class="cmp-row"><span>What CTUB treats on an average day</span><div class="cmp-tr"><i class="me" data-w="1.3"></i></div><b>1.66M gal</b></div></div>`,
+  tanks: () => `<div class="tanks"><div class="tk">${'<span><i data-h="78"></i></span>'.repeat(7)}</div>
+      <p><b>3.57M gallons</b> across seven tanks. About two days of average demand.</p></div>`,
+  route: () => `<div class="route"><div class="rline">${'<span class="stop"></span>'.repeat(5)}<span class="boat"></span></div>
+      <div class="rnames"><span>CTUB plant</span><span>Evitts Run</span><span>Shenandoah</span><span>Potomac</span><span>Chesapeake Bay</span></div></div>`
+};
+
+const jr = document.getElementById('journey'), track = document.getElementById('track'), panel = document.getElementById('panel');
+const playBtn = document.getElementById('play');
+let sys = 'w', idx = 0, playTimer = null, procTimer = null;
+
+function drawTrack(){
+  track.querySelectorAll('.node').forEach(n => n.remove());
+  SYS[sys].steps.forEach((s, i) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'node';
+    b.setAttribute('aria-label', `Stop ${i + 1}: ${s.name}`);
+    b.innerHTML = `<span class="dot">${I(s.ic)}</span><b>${s.name}</b><span class="sub">${s.sub}</span>`;
+    b.onclick = () => { stopPlay(); go(i); };
+    track.appendChild(b);
+  });
+}
+
+function go(i){
+  const st = SYS[sys].steps;
+  idx = i;
+  track.querySelectorAll('.node').forEach((n, k) => {
+    n.classList.toggle('on', k === i);
+    n.classList.toggle('done', k < i);
+    if (k === i) n.setAttribute('aria-current', 'step'); else n.removeAttribute('aria-current');
+  });
+  track.querySelector('.pipe i').style.width = (i / (st.length - 1) * 100) + '%';
+  track.querySelector('.marker').style.left = ((i + .5) / st.length * 100) + '%';
+  render(st[i], i, st.length);
+}
+
+function render(s, i, n){
+  clearInterval(procTimer);
+  const st = SYS[sys].steps;
+  const nextLabel = i < n - 1 ? `Next: ${st[i + 1].name} &rarr;`
+    : sys === 'w' ? 'Now follow it down the drain &rarr;' : 'Who runs all this &darr;';
+  const prevOff = sys === 'w' && i === 0;
+  panel.innerHTML = `
+    <div class="ph"><div class="num">${String(i + 1).padStart(2, '0')}<small>/${String(n).padStart(2, '0')}</small></div>
+      <div><div class="k">${s.k}</div><h3>${s.h}</h3></div></div>
+    <div class="pb">
+      <div>
+        <p class="lead">${s.lead}</p>
+        ${s.viz ? VIZ[s.viz]() : ''}
+        ${s.proc ? `<div class="proc"><div class="proc-steps">${s.proc.map((p, k) => `<button type="button" data-k="${k}"><i>${k + 1}</i>${p[0]}</button>`).join('')}</div><p class="proc-desc"></p></div>` : ''}
+      </div>
+      <div class="stats">${s.stats.map(x => `<div><b>${x[0]}</b><span>${x[1]}</span></div>`).join('')}</div>
+    </div>
+    ${s.more ? `<details class="more"><summary>The details</summary><div class="mbody">${s.more}</div></details>` : ''}
+    <div class="pnav"><button type="button" class="prev" ${prevOff ? 'disabled' : ''}>&larr; Back</button><button type="button" class="next">${nextLabel}</button></div>`;
+  panel.classList.remove('swap'); void panel.offsetWidth; panel.classList.add('swap');
+
+  grow(panel);
+  panel.querySelector('.more')?.addEventListener('toggle', e => { if (e.target.open) grow(e.target); });
+  if (s.proc) wireProc(panel.querySelector('.proc'), s.proc);
+
+  panel.querySelector('.next').onclick = () => {
+    stopPlay();
+    if (i < n - 1) go(i + 1);
+    else if (sys === 'w') { setSys('s'); jr.scrollIntoView({ behavior: 'smooth' }); }
+    else document.getElementById('oversight').scrollIntoView({ behavior: 'smooth' });
+  };
+  panel.querySelector('.prev').onclick = () => {
+    stopPlay();
+    if (i > 0) go(i - 1); else setSys('w', 5);
+  };
+}
+
+// animate bars and tanks from empty once they're on the page
+function grow(root){
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    root.querySelectorAll('[data-w]').forEach(el => el.style.width = el.dataset.w + '%');
+    root.querySelectorAll('[data-h]').forEach((el, k) => setTimeout(() => el.style.height = el.dataset.h + '%', k * 110));
+  }));
+}
+
+function wireProc(box, steps){
+  const btns = [...box.querySelectorAll('button')], desc = box.querySelector('.proc-desc');
+  let k = 0;
+  const show = j => {
+    k = j;
+    btns.forEach((b, x) => b.classList.toggle('on', x === j));
+    desc.innerHTML = `<b>${steps[j][0]}.</b> ${steps[j][1]}`;
+    const on = btns[j]; on.classList.remove('on'); void on.offsetWidth; on.classList.add('on');
+  };
+  show(0);
+  procTimer = setInterval(() => show((k + 1) % steps.length), 2600);
+  btns.forEach((b, j) => b.onclick = () => { clearInterval(procTimer); box.classList.add('paused'); show(j); });
+}
+
+function setSys(k, at = 0){
+  sys = k; jr.dataset.sys = k;
+  jr.querySelectorAll('.seg button').forEach(b => b.setAttribute('aria-selected', b.dataset.sys === k));
+  document.getElementById('jtitle').firstChild.nodeValue = SYS[k].title;
+  drawTrack(); go(at);
+}
+
+function stopPlay(){
+  clearInterval(playTimer); playTimer = null;
+  playBtn.classList.remove('on');
+  playBtn.querySelector('use').setAttribute('href', '#i-play');
+  playBtn.querySelector('span').textContent = 'Play the trip';
+}
+playBtn.onclick = () => {
+  if (playTimer) return stopPlay();
+  playBtn.classList.add('on');
+  playBtn.querySelector('use').setAttribute('href', '#i-pause');
+  playBtn.querySelector('span').textContent = 'Pause';
+  if (idx === SYS[sys].steps.length - 1) go(0);
+  playTimer = setInterval(() => {
+    if (idx < SYS[sys].steps.length - 1) go(idx + 1); else stopPlay();
+  }, 6000);
+};
+
+jr.querySelectorAll('.seg button').forEach(b => b.onclick = () => { stopPlay(); setSys(b.dataset.sys); });
+document.querySelectorAll('[data-go]').forEach(a => a.addEventListener('click', () => { stopPlay(); setSys(a.dataset.go); }));
+setSys('w');
+
+// who's in charge
+const ORG = [
+  `<div class="chain"><span>City Council</span><s>appoints</s><span>5-member CTUB Board</span><s>runs</s><span>water + sewer</span></div>The Charles Town City Council created CTUB in 1998 and appoints its Board.`,
+  `Approves CTUB's rates and fees, along with the City Council.`,
+  `Through its Office of Environmental Health Services, regulates drinking water quality and signs off on water system designs.`,
+  `Issues the permits that limit what's in the treated wastewater CTUB returns to streams.`
+];
+const orgNote = document.getElementById('orgnote');
+document.querySelectorAll('#org button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('#org button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  orgNote.innerHTML = ORG[b.dataset.i];
+  orgNote.classList.remove('swap'); void orgNote.offsetWidth; orgNote.classList.add('swap');
+});
+orgNote.innerHTML = ORG[0];
+
+// count-up numbers, scroll reveal, rate bars
+function countUp(el){
+  const to = +el.dataset.to, dec = +(el.dataset.dec || 0), pre = el.dataset.pre || '', suf = el.dataset.suf || '';
+  const t0 = performance.now(), dur = 1200;
+  const tick = t => {
+    const p = Math.max(0, Math.min((t - t0) / dur, 1)), e = 1 - Math.pow(1 - p, 3);
+    el.textContent = pre + (to * e).toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec }) + suf;
+    if (p < 1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const io = new IntersectionObserver(entries => entries.forEach(en => {
+  if (!en.isIntersecting) return;
+  const el = en.target; io.unobserve(el);
+  el.classList.add('in');
+  if (!reduce) el.querySelectorAll('[data-to]').forEach(countUp);
+  if (el.id === 'cost') grow(el);
+}), { threshold: .2 });
+document.querySelectorAll('.rv, .hero').forEach(el => io.observe(el));
+</script>
+</body>
+</html>

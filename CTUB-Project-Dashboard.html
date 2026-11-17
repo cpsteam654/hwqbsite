@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CTUB Project Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+/* Palette taken from ctubwv.com */
+:root{
+  --navy:#003F75;        /* nav bar */
+  --navy-dk:#002A50;
+  --blue:#095EA8;        /* quick-link tiles */
+  --blue-2:#215D91;      /* breadcrumb band / submenu */
+  --link:#4078A8;        /* body links, post-list buttons */
+  --blue-lt:#E8F1F9;
+  --green:#71CB67;       /* tile icons, active nav, current-date row */
+  --green-dk:#2F7D2A;
+  --green-lt:#E6F5E4;
+  --waste:#3F8F3A;       /* wastewater track */
+  --waste-lt:#EAF5E8;
+  --amber:#9A7A1E;
+  --amber-lt:#FFF8E6;
+  --slate:#7C8B98;
+  --ink:#1B1B1B;
+  --ink-soft:#55626D;
+  --line:#DDE4EA;
+  --page:#EFEFEF;
+  --card:#FFFFFF;
+  --shadow:3px -1px 29px -12px rgba(0,0,0,.6);
+  --shadow-sm:0 1px 3px rgba(0,0,0,.08),0 6px 18px -10px rgba(0,40,80,.35);
+  box-sizing:border-box;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--page);
+  color:var(--ink);
+  font-family:"Open Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  font-size:17px;
+  line-height:1.6;
+}
+h1,h2,h3,h4{font-family:inherit;line-height:1.25;margin:0;color:var(--ink);font-weight:600}
+a{color:var(--link)}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.ic{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+.shell{max-width:1120px;margin:0 auto;padding:28px 16px 60px}
+.main{background:var(--card);box-shadow:var(--shadow);padding:28px 34px 40px;min-width:0}
+.main.bare{background:transparent;box-shadow:none;padding:0}
+
+/* ---- draft banner ---- */
+.draftbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#FFF4D6;border:1px solid #E9C46A;border-left:6px solid #C8962E;color:#5A4206;border-radius:8px;padding:10px 16px;margin:0 0 22px;font-size:15px;line-height:1.4}
+.draftbar b{background:#C8962E;color:#fff;font-size:12px;letter-spacing:1.6px;border-radius:4px;padding:3px 9px}
+
+/* ================= dashboard module ================= */
+.dash{font-size:15px;line-height:1.5;margin:0 0 34px;background:var(--card);border-radius:10px;box-shadow:var(--shadow);overflow:hidden;scroll-margin-top:16px}
+.main:not(.bare) .dash{box-shadow:var(--shadow-sm);border:1px solid var(--line)}
+
+.dashband{
+  position:relative;color:#fff;padding:26px 30px 44px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 60' preserveAspectRatio='none'%3E%3Cpath d='M0 30c150-26 300-26 450 0s300 26 450 0 225-20 300-10v40H0z' fill='%23ffffff' fill-opacity='.07'/%3E%3Cpath d='M0 42c200-20 400-20 600 0s400 20 600 0v18H0z' fill='%23ffffff' fill-opacity='.08'/%3E%3C/svg%3E") bottom/100% 60px no-repeat,
+    linear-gradient(120deg,var(--navy-dk) 0%,var(--navy) 45%,var(--blue) 100%);
+}
+.dashband.ww{background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 60' preserveAspectRatio='none'%3E%3Cpath d='M0 30c150-26 300-26 450 0s300 26 450 0 225-20 300-10v40H0z' fill='%23ffffff' fill-opacity='.07'/%3E%3Cpath d='M0 42c200-20 400-20 600 0s400 20 600 0v18H0z' fill='%23ffffff' fill-opacity='.08'/%3E%3C/svg%3E") bottom/100% 60px no-repeat,
+    linear-gradient(120deg,#0F3A2A 0%,#1F5E36 45%,var(--waste) 100%)}
+.dashband::after{content:"";position:absolute;left:0;right:0;bottom:0;height:5px;background:var(--green)}
+.dashband.ww::after{background:#A8E29F}
+.dashband .eyebrow{display:inline-flex;align-items:center;gap:8px;color:var(--green);font-size:12px;letter-spacing:1.8px;text-transform:uppercase;font-weight:700}
+.dashband.ww .eyebrow{color:#B9EAB1}
+.dashband .eyebrow::before{content:"";width:22px;height:2px;background:currentColor;border-radius:2px}
+.dash .dashband h2{margin:8px 0 6px;font-size:27px;color:#fff;font-weight:700;letter-spacing:-.2px}
+.dashband .s{color:#cfe0f0;font-size:15px;margin-bottom:4px;max-width:72ch}
+.dashband.ww .s{color:#d6eed2}
+.dashband .s:last-child{margin-bottom:0}
+
+.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px}
+.chips>div{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:12px 14px}
+.chips .ci{width:42px;height:42px;border-radius:50%;border:2px solid var(--green);color:var(--green);display:grid;place-items:center;font-size:20px;flex:none}
+.chips .n{font-size:25px;font-weight:700;color:#fff;line-height:1.1}
+.chips .l{font-size:11px;color:#bcd2e6;letter-spacing:.8px;margin-top:3px;font-weight:600;text-transform:uppercase}
+
+.dashbody{padding:24px 28px 28px}
+.dash .shead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:1.6px solid var(--ink);padding-bottom:9px;margin:6px 0 16px}
+.dash .shead+p.sintro{margin-top:-6px}
+.dash .shead .tag{width:34px;height:34px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-size:17px;flex:none}
+.dash .shead .tag.ww{background:var(--waste)}
+.dash .shead .tag.nv{background:var(--navy)}
+.dash .shead .tag.sl{background:var(--slate)}
+.dash .shead h3{margin:0;font-size:20px;font-weight:600}
+.dash .shead h3 small{display:block;font-size:13px;font-weight:600;color:var(--ink-soft);margin-top:1px}
+.dash .shead .note{margin-left:auto;color:var(--ink-soft);font-size:12.5px;background:#F3F5F7;border-radius:20px;padding:3px 11px;font-weight:600}
+.dash .shead a{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--link);font-weight:600;text-decoration:none}
+.dash .shead a:hover{color:var(--navy);text-decoration:underline}
+.dash p.sintro{font-size:15px;color:var(--ink-soft);margin:0 0 16px;max-width:80ch}
+
+.kgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.kgrid.three{grid-template-columns:repeat(3,1fr)}
+.kpi{background:#F5F9FC;border-radius:10px;padding:14px 16px 15px;border-top:4px solid var(--blue);position:relative}
+.kpi .kl{font-size:11.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.7px;font-weight:600}
+.kpi .kv{font-size:28px;font-weight:700;color:var(--navy);margin-top:4px;line-height:1.15;font-variant-numeric:tabular-nums}
+.kpi .ks{font-size:13px;color:var(--ink-soft);margin-top:2px}
+.kpi.w{border-top-color:var(--waste);background:#F5FAF4}
+.kpi.w .kv{color:var(--green-dk)}
+.kpi.nv{border-top-color:var(--navy)}
+.kpi.alt{border-top-color:var(--slate);background:#F6F7F8}
+.kpi.alt .kv{color:#3F4B56}
+.kpi.hl{background:var(--navy);border-top-color:var(--green)}
+.kpi.hl .kl,.kpi.hl .ks{color:#bcd2e6}
+.kpi.hl .kv{color:#fff}
+
+.steward{position:relative;background:var(--green-lt);border-left:5px solid var(--green);border-radius:0 10px 10px 0;padding:15px 18px 15px 58px;font-size:15px;margin-bottom:26px}
+.steward:last-child{margin-bottom:0}
+.steward::before{content:"";position:absolute;left:18px;top:15px;width:26px;height:26px;border-radius:50%;background:var(--green-dk) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center/14px no-repeat}
+.steward.info{background:var(--blue-lt);border-left-color:var(--blue)}
+.steward.info::before{background:var(--blue) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M12 11v6M12 7h.01'/%3E%3C/svg%3E") center/16px no-repeat}
+.steward b{color:var(--green-dk)}
+.steward.info b{color:var(--navy)}
+.steward a{color:var(--navy);font-weight:700}
+
+/* yes/no question cards */
+.qcards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:26px}
+.qcard{background:#F5FAF4;border:1px solid #D3EBCF;border-radius:10px;padding:16px 18px}
+.qcard .yes{display:inline-flex;align-items:center;gap:6px;background:var(--green-dk);color:#fff;font-size:11px;font-weight:700;letter-spacing:1px;border-radius:20px;padding:3px 11px 3px 8px;margin-bottom:10px}
+.qcard .yes::before{content:"\2713";font-size:12px}
+.qcard .q{font-size:17px;font-weight:700;color:var(--navy);margin-bottom:6px;line-height:1.3}
+.qcard p{margin:0;font-size:14px}
+
+/* affordability gauge */
+.gaugewrap{margin:34px 0 10px}
+.gauge{position:relative;height:42px;border-radius:21px;background:linear-gradient(90deg,#EEF3F7 0 80%,#F9E1DE 80% 100%);box-shadow:inset 0 1px 3px rgba(0,0,0,.12)}
+.gauge::before{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--val);border-radius:21px;background:linear-gradient(90deg,var(--green) 0%,var(--waste) 100%)}
+.thresh{position:absolute;top:-8px;bottom:-8px;width:3px;background:#B23A2E;left:80%;border-radius:2px}
+.threshlbl{position:absolute;left:80%;transform:translateX(-50%);top:-30px;font-size:12px;color:#B23A2E;font-weight:700;white-space:nowrap}
+.mlabel{position:absolute;left:var(--val);transform:translate(-50%,-50%);top:50%;background:#fff;color:var(--navy);font-size:13px;font-weight:700;border-radius:20px;padding:3px 11px;box-shadow:0 2px 6px rgba(0,0,0,.25);white-space:nowrap}
+.scale{position:relative;height:18px;margin-top:8px;color:var(--ink-soft);font-size:12px}
+.scale span{position:absolute;transform:translateX(-50%)}
+.scale span:first-child{transform:none}
+.scale span:last-child{transform:translateX(-100%)}
+.gaugecap{font-size:13px;color:var(--ink-soft);margin:14px 0 22px}
+
+/* ---- rate comparison ---- */
+.rrow{display:grid;grid-template-columns:190px 1fr;gap:16px;align-items:center;margin-bottom:14px}
+.rname b{display:block;font-size:16px;color:var(--navy);line-height:1.25}
+.rname span{display:block;color:var(--ink-soft);font-size:13px;margin-top:1px}
+.rtrack{position:relative;height:36px;background:#EEF3F7;border-radius:18px;overflow:hidden}
+.rbar{height:100%;border-radius:18px;display:flex;align-items:center;justify-content:flex-end;padding-right:14px;color:#fff;font-size:16px;font-weight:700;min-width:84px}
+.rbar.ctub{background:linear-gradient(90deg,var(--navy),var(--blue))}
+.rbar.wvaw{background:linear-gradient(90deg,#8E9BA6,var(--slate))}
+.raxis{position:relative;height:16px;margin:-6px 0 20px 206px;color:var(--ink-soft);font-size:11.5px}
+.raxis span{position:absolute;transform:translateX(-50%)}
+.raxis span:first-child{transform:none}
+.rgap{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:26px}
+.rgap>div{background:var(--green-lt);border-radius:10px;padding:14px 16px;text-align:center}
+.rgap .n{font-size:30px;font-weight:800;color:var(--green-dk);line-height:1.1}
+.rgap .l{font-size:12px;color:var(--ink-soft);letter-spacing:.6px;margin-top:4px;text-transform:uppercase;font-weight:600}
+.cum{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-bottom:14px;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.cum>div{padding:14px 16px;background:#F5F9FC;position:relative}
+.cum>div+div{border-left:1px solid var(--line)}
+.cum>div:nth-child(2){background:#EAF2F9}
+.cum>div:nth-child(3){background:#DDEAF6}
+.cum .cn{font-size:24px;font-weight:700;color:var(--navy)}
+.cum .cl{font-size:12px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.6px;margin-top:2px;font-weight:600}
+.rnote{font-size:13.5px;color:var(--ink-soft);margin:0 0 12px;line-height:1.55}
+details.rtable{border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:14px}
+details.rtable summary{cursor:pointer;padding:11px 16px;font-size:14px;font-weight:700;color:var(--navy);background:#F5F9FC;list-style:none}
+details.rtable summary:hover{background:var(--blue-lt)}
+details.rtable summary::-webkit-details-marker{display:none}
+details.rtable summary::before{content:"\25B8\00a0";color:var(--link)}
+details.rtable[open] summary::before{content:"\25BE\00a0"}
+.rt-scroll{overflow-x:auto}
+table.rt{width:100%;border-collapse:collapse;font-size:14px}
+table.rt th,table.rt td{text-align:left;padding:10px 16px;border-top:1px solid var(--line);vertical-align:top}
+table.rt th{color:var(--ink-soft);font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;font-weight:700;background:#FAFBFC}
+table.rt tr:nth-child(even) td{background:#FAFCFD}
+table.rt td.num{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+
+.srcnote{font-size:12.5px;color:var(--ink-soft);border-top:1px solid var(--line);padding-top:12px;margin:22px 0 0;line-height:1.55}
+
+/* ---- project cards ---- */
+.pcards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.pcard{background:#fff;border:1px solid var(--line);border-radius:10px;padding:18px 20px 20px;display:flex;flex-direction:column;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;transition:transform .15s ease,box-shadow .15s ease}
+.pcard::before{content:"";position:absolute;left:0;right:0;top:0;height:5px;background:var(--green)}
+.pcard.soon::before{background:var(--blue)}
+.pcard:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(0,0,0,.08),0 14px 26px -14px rgba(0,40,80,.45)}
+.pill{display:inline-flex;align-items:center;gap:6px;background:var(--green-lt);color:var(--green-dk);font-size:11px;font-weight:700;letter-spacing:1px;border-radius:20px;padding:3px 10px;margin:4px 0 11px;align-self:flex-start;text-transform:uppercase}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.pill.soon,.pcard.soon .pill{background:var(--blue-lt);color:var(--blue)}
+.pcard h4{margin:0 0 6px;color:var(--navy);font-size:18px;font-weight:700;line-height:1.3}
+.where{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--ink-soft);margin:0 0 10px;font-weight:600}
+.where::before{content:"";width:14px;height:14px;flex:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2355626D' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z'/%3E%3Ccircle cx='12' cy='10' r='2.5'/%3E%3C/svg%3E") center/contain no-repeat}
+.pcard p.b{margin:0 0 16px;font-size:14.5px;flex:1}
+.pcard .more,.btn{display:inline-flex;align-items:center;gap:7px;align-self:flex-start;background:var(--link);color:#fff;text-decoration:none;font-size:14px;font-weight:600;padding:7px 15px;border-radius:5px;border:1px solid var(--navy);transition:background .15s}
+.pcard .more::after,.btn.go::after{content:"\2192"}
+.pcard .more:hover,.btn:hover{background:var(--navy)}
+.btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--navy)}
+.btn.ghost:hover{background:var(--blue-lt)}
+
+.sitelink{display:flex;align-items:center;gap:18px;flex-wrap:wrap;background:linear-gradient(120deg,var(--navy-dk),var(--navy) 60%,var(--blue));color:#fff;border-radius:10px;padding:20px 24px;margin:30px 0 0}
+.sitelink div{flex:1 1 300px}
+.sitelink strong{display:block;font-size:18px}
+.sitelink span{color:#cfe0f0;font-size:15px}
+.sitelink .btn{background:var(--green);color:#0E2A12;border-color:var(--green);font-weight:700}
+.sitelink .btn:hover{background:#fff}
+
+/* ---- interior pages ---- */
+.backlink{display:inline-flex;align-items:center;gap:6px;margin:0 0 16px;font-size:15px;font-weight:600;text-decoration:none}
+.backlink:hover{text-decoration:underline}
+.main>h1{font-size:30px;font-weight:600;margin-bottom:14px;padding-bottom:10px;border-bottom:1.6px solid var(--ink)}
+.main>.titlemeta{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:-4px 0 16px}
+.main>.titlemeta .pill,.main>.titlemeta .where{margin:0}
+.main>p{max-width:74ch}
+.main>p.srcnote{max-width:none}
+.main>.lede{font-size:18px;color:var(--ink-soft);margin:0 0 28px}
+.main>h2{font-size:23px;margin:36px 0 12px;color:var(--navy);display:flex;align-items:center;gap:10px}
+.main>h2::before{content:"";width:6px;height:22px;border-radius:3px;background:var(--green);flex:none}
+.main>h3{font-size:18.5px;margin:26px 0 6px}
+:where(.main) p{margin:0 0 15px}
+
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:6px 0 22px}
+.facts>div{background:#F5F9FC;border-radius:10px;padding:13px 15px;border-top:4px solid var(--blue)}
+.facts .fl{font-size:11.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.7px;font-weight:600}
+.facts .fv{font-size:19px;font-weight:700;color:var(--navy);line-height:1.25;margin-top:3px}
+.facts .fs{font-size:13px;color:var(--ink-soft);margin-top:2px}
+
+.specs{list-style:none;margin:4px 0 20px;padding:0;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.specs li{padding:11px 16px;font-size:16px;border-bottom:1px solid var(--line);background:#F5F9FC}
+.specs li:nth-child(even){background:#fff}
+.specs li:last-child{border-bottom:0}
+.specs strong{color:var(--navy);font-variant-numeric:tabular-nums}
+
+/* ---- timeline ---- */
+.tl{list-style:none;margin:10px 0 8px;padding:0 0 0 30px;border-left:3px solid var(--blue-lt)}
+.tl>li{position:relative;padding:0 0 24px 18px}
+.tl>li::before{content:"";position:absolute;left:-41px;top:4px;width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid var(--blue)}
+.tl>li.yr{padding-bottom:14px}
+.tl>li.yr::before{width:22px;height:22px;left:-44px;top:3px;background:var(--navy);border-color:var(--navy)}
+.tl>li.yr span{display:inline-block;background:var(--navy);color:#fff;font-weight:700;font-size:14px;letter-spacing:.8px;border-radius:20px;padding:2px 12px}
+.tl>li.gap::before{border-color:#C8A94F;border-style:dashed}
+.tl>li.now::before{background:var(--green);border-color:var(--green-dk)}
+.tl .date{font-weight:700;font-size:15.5px;color:var(--navy);display:block}
+.tl p{margin:2px 0 0;font-size:16px}
+.tl .sub{margin-top:9px;padding:12px 15px;background:#F5F9FC;border-radius:8px;font-size:15px}
+.tl .sub p{font-size:15px;margin:0 0 8px}
+.tl .sub p:last-child{margin-bottom:0}
+
+.docs{list-style:none;margin:6px 0 18px;padding:0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.docs li{display:flex;gap:14px;align-items:baseline;padding:11px 16px;border-bottom:1px solid var(--line);font-size:15.5px}
+.docs li:last-child{border-bottom:0}
+.docs li:nth-child(odd){background:#FAFCFD}
+.docs .d{font-variant-numeric:tabular-nums;color:var(--ink-soft);font-size:14px;flex:none;width:118px;font-weight:600}
+.docs a{font-weight:600}
+
+.callout{background:var(--blue-lt);border-left:5px solid var(--blue);padding:16px 20px;border-radius:0 10px 10px 0;margin:18px 0}
+.callout p:last-child{margin-bottom:0}
+.callout.warm{background:var(--amber-lt);border-left-color:#C8A94F}
+
+.stub{color:#7A858C;font-style:italic}
+.att{margin-top:9px;font-size:15px;color:var(--ink-soft)}
+.att b{font-weight:700;color:var(--ink);font-size:13px;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.6px}
+.att a{display:inline-flex;align-items:center;gap:9px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;text-decoration:none;font-weight:600;font-size:15px;word-break:break-word}
+.att a::before{content:"PDF";font-size:10px;font-weight:700;letter-spacing:.3px;color:#fff;background:#B23A2E;padding:2px 5px;border-radius:3px;flex:none}
+.att a:hover{border-color:var(--link);background:var(--blue-lt)}
+
+/* ---- faq ---- */
+details.faq{border:1px solid var(--line);border-radius:10px;margin-bottom:10px;background:#fff;transition:box-shadow .15s}
+details.faq[open]{box-shadow:var(--shadow-sm);border-color:#C9D9E7}
+details.faq summary{cursor:pointer;padding:15px 56px 15px 18px;font-weight:600;font-size:17px;color:var(--navy);position:relative;list-style:none}
+details.faq summary:hover{background:#F5F9FC;border-radius:10px}
+details.faq summary::-webkit-details-marker{display:none}
+details.faq summary::after{content:"+";position:absolute;right:16px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:50%;background:var(--blue-lt);color:var(--blue);display:grid;place-items:center;font-size:20px;font-weight:600;line-height:1}
+details.faq[open] summary::after{content:"\2013";background:var(--blue);color:#fff}
+details.faq .body{padding:14px 18px 18px;border-top:1px solid var(--line)}
+details.faq .body p:last-child{margin-bottom:0}
+
+@media (max-width:900px){
+  .chips{grid-template-columns:repeat(2,1fr)}
+  .kgrid,.kgrid.three{grid-template-columns:repeat(2,1fr)}
+  .pcards,.qcards{grid-template-columns:1fr}
+}
+@media (max-width:620px){
+  .shell{padding:16px 16px 40px}
+  .main{padding:22px 18px 30px}
+  .main>h1{font-size:25px}
+  .dashband{padding:22px 18px 38px}
+  .dash .dashband h2{font-size:22px}
+  .dashbody{padding:20px 16px 22px}
+  .chips>div{padding:10px;gap:9px}
+  .chips .ci{width:34px;height:34px;font-size:16px}
+  .chips .n{font-size:20px}
+  .kpi{padding:12px 12px 13px}
+  .kpi .kv{font-size:22px}
+  .rrow{grid-template-columns:1fr;gap:5px}
+  .raxis{margin-left:0}
+  .rgap{grid-template-columns:1fr}
+  .cum{grid-template-columns:1fr}
+  .cum>div+div{border-left:0;border-top:1px solid var(--line)}
+  .steward{padding:46px 16px 14px}
+  .steward::before{left:16px;top:13px}
+  .dash .shead .note,.dash .shead a{margin-left:46px}
+  .docs li{flex-wrap:wrap;gap:2px}
+  .docs .d{width:100%}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}html{scroll-behavior:auto}}
+
+</style>
+</head>
+<body>
+<!-- icon set -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-people" viewBox="0 0 24 24"><path d="M16 20v-1.5a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4V20"/><circle cx="9" cy="7.5" r="3.6"/><path d="M22 20v-1.5a4 4 0 0 0-3-3.85M16 3.6a3.8 3.8 0 0 1 0 7.4"/></symbol>
+  <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 2.8s-6.5 7-6.5 11.7a6.5 6.5 0 0 0 13 0C18.5 9.8 12 2.8 12 2.8z"/></symbol>
+  <symbol id="i-cycle" viewBox="0 0 24 24"><path d="M20.5 12a8.5 8.5 0 0 1-14.6 5.9M3.5 12A8.5 8.5 0 0 1 18.1 6.1"/><path d="M18.5 2.5v4h-4M5.5 21.5v-4h4"/></symbol>
+  <symbol id="i-brief" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8.5 7V5.2A2.2 2.2 0 0 1 10.7 3h2.6a2.2 2.2 0 0 1 2.2 2.2V7M3 13h18"/></symbol>
+  <symbol id="i-waves" viewBox="0 0 24 24"><path d="M2 7c2.5-2 4.5-2 7 0s4.5 2 7 0 4.5-2 6 0M2 12.5c2.5-2 4.5-2 7 0s4.5 2 7 0 4.5-2 6 0M2 18c2.5-2 4.5-2 7 0s4.5 2 7 0 4.5-2 6 0"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+  <symbol id="i-dollar" viewBox="0 0 24 24"><path d="M12 2v20M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></symbol>
+  <symbol id="i-trend" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M14 7h7v7"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></symbol>
+  <symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 9.5 12 4l9 5.5M5 10v8M9.7 10v8M14.3 10v8M19 10v8M3 21h18"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 9.5V20h14V9.5"/><path d="M10 20v-6h4v6"/></symbol>
+  <symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 3v18M7 21h10M4 7h16M4 7l-2.5 6a3.5 3.5 0 0 0 5 0L4 7zM20 7l-2.5 6a3.5 3.5 0 0 0 5 0L20 7z"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h6"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.9A8 8 0 1 1 21 12z"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+</svg>
+
+
+<div class="shell">
+  <div class="draftbar"><b>DRAFT</b></div>
+  <main class="main" id="main"></main>
+</div>
+
+<script>
+const PAGES = {};
+const SITE_PROJECTS = "https://ctubwv.com/information/current-projects/";
+const BOARD_MEETINGS = "https://ctubwv.com/organization/board-meetings/";
+const CONTACT = "https://ctubwv.com/organization/contact-us/";
+const PACKET = "https://d3n9y02raazwpg.cloudfront.net/ctubwv/";
+
+var SITELINK = `
+<div class="sitelink">
+  <div><strong>More on CTUB's current projects</strong><span>Pending Public Service Commission cases, notices, and project updates on the CTUB website.</span></div>
+  <a class="btn go" href="${SITE_PROJECTS}" target="_blank" rel="noopener">Visit the Current Projects page</a>
+</div>`;
+
+var ROLE = `
+<h2>What is CTUB's role in new project development?</h2>
+<p>The Charles Town Utility Board has full and complete authority for the supervision, management, control, and operation of its water and wastewater utility systems for the City of Charles Town and the surrounding area.</p>
+<p>CTUB does not have authority over project approvals or planning and zoning decisions. CTUB's sole focus is on ensuring that any new project in its service area, commercial or residential, is connected to the system in a safe, environmentally sound, and fiscally responsible way that does not disrupt service to other customers.</p>`;
+
+var CONTACTBLOCK = `
+<div class="callout"><p>Members of the public are encouraged to reach out to CTUB with questions and comments regarding water and sewer service to their area. Fill out the form on our <a href="${CONTACT}" target="_blank" rel="noopener">contact page</a> and we will update the project page with answers to the most frequently asked questions.</p></div>`;
+
+var PROJECTCARDS = `
+<div class="pcards">
+
+  <div class="pcard">
+    <span class="pill">Construction</span>
+    <h4>Greenfield Force Main &amp; Samuel Street Pump Station</h4>
+    <p class="where">Greenfield area and U.S. Route 340, Charles Town</p>
+    <p class="b">A new wastewater force main from the Greenfield Pump Station, including a crossing under U.S. Route 340, plus pump station upgrades and a new flow meter. Construction is scheduled from November 16, 2026, to May 15, 2027.</p>
+    <a class="more" href="#/greenfield">Learn more</a>
+  </div>
+
+  <div class="pcard">
+    <span class="pill">Active</span>
+    <h4>Sidewinder Enterprises, LLC / Mountain Pure</h4>
+    <p class="where">Former 3M/Kodak site, Middleway</p>
+    <p class="b">A private bottling and water treatment facility on the former 3M/Kodak property. CTUB's role is limited to the terms on which the site connects to the public system. Land use approval rests with Jefferson County.</p>
+    <a class="more" href="#/sidewinder">Learn more</a>
+  </div>
+
+  <div class="pcard soon">
+    <span class="pill">In development</span>
+    <h4>Summit Point Regional Corridor</h4>
+    <p class="where">Summit Point, southern Jefferson County</p>
+    <p class="b">Proposed public water and sanitary sewer service, and potentially reclaimed water, for the Summit Point area, starting with Summit Point Motorsports Park. CTUB is moving forward with a Preliminary Engineering Report, the step state law requires before infrastructure funding.</p>
+    <a class="more" href="#/summit-point">Learn more</a>
+  </div>
+
+  <div class="pcard soon">
+    <span class="pill">In development</span>
+    <h4>Augustine Manor</h4>
+    <p class="where">Charles Town</p>
+    <p class="b">A residential subdivision of 88 single-family homes and 60 townhomes. The City of Charles Town approved the Phase 1 preliminary plan in December 2025 and initiated the Phase 1 bond in August 2026.</p>
+    <a class="more" href="#/augustine-manor">Learn more</a>
+  </div>
+
+</div>`;
+
+/* ================= landing ================= */
+PAGES["/"] = {
+  html: `
+<h1>Current Project Dashboard</h1>
+<p class="lede">Project pages explain what the Utility Board has been asked to do, what it has decided, and what records support each decision. Every page carries a dated timeline, the underlying documents, and links to the board meetings where the matter was discussed.</p>
+
+${PROJECTCARDS}
+
+<h2>Pending West Virginia Public Service Commission cases</h2>
+<ul class="specs">
+  <li><strong>25-0263-W-C</strong> &mdash; CTUB complaint against West Virginia American Water (service territory)</li>
+  <li><strong>26-0854-LRR-WS-C</strong> &mdash; Formal complaint, quality of service (interim relief)</li>
+</ul>
+<p>For more information on pending WV PSC cases, <a href="https://www.psc.state.wv.us/WebDocket/default.htm" target="_blank" rel="noopener">visit the Commission's docket search</a>.</p>
+
+${SITELINK}
+`
+};
+
+/* ================= Greenfield ================= */
+PAGES["/greenfield"] = {
+  html: `
+<a class="backlink" href="#/">&#8592; All current projects</a>
+<h1>Greenfield Force Main Upgrade &amp; Samuel Street Pump Station Improvements</h1>
+<div class="titlemeta"><span class="pill">Construction</span><span class="where">Greenfield area and U.S. Route 340, Charles Town</span></div>
+<p class="lede">A CTUB wastewater project to improve the underground pipes that carry sewage from the Greenfield area, and to add flow monitoring at the Samuel Street Pump Station.</p>
+
+<div class="facts">
+  <div><div class="fl">Construction start</div><div class="fv">November 16, 2026</div><div class="fs">subject to weather and site conditions</div></div>
+  <div><div class="fl">Scheduled completion</div><div class="fv">May 15, 2027</div><div class="fs">substantial completion</div></div>
+  <div><div class="fl">Work hours</div><div class="fv">6 AM&ndash;8 PM</div><div class="fs">actual days and hours will vary</div></div>
+  <div><div class="fl">Citizens Way</div><div class="fv">Stays open</div><div class="fs">no full closure expected; lane restrictions possible</div></div>
+</div>
+
+<h2>What is the Greenfield project?</h2>
+<p>Wastewater from homes and businesses in the Greenfield area flows to the Greenfield Pump Station, which pushes it through a pressurized pipe, called a force main, toward treatment. This project builds a new force main from that pump station, upgrades the pump station's equipment, and adds a flow meter at the Samuel Street Pump Station.</p>
+<ul class="specs">
+  <li>Construction of a <strong>new wastewater force main</strong> from the Greenfield Pump Station, including a crossing under <strong>U.S. Route 340</strong></li>
+  <li><strong>Mechanical improvements</strong> to the Greenfield Pump Station</li>
+  <li>Installation of a <strong>wastewater flow meter</strong> at the Samuel Street Pump Station</li>
+</ul>
+<p>These improvements support the reliability, operation, and monitoring of CTUB's wastewater collection system.</p>
+
+<h2>What to expect during construction</h2>
+<p>Work will take place along the new force main route near the Greenfield Pump Station, U.S. Route 340, Citizens Way, and nearby areas shown on the project map. Residents and drivers may see construction equipment, temporary traffic control, excavation, and occasional lane restrictions.</p>
+<p>To limit digging at the surface, the pipe will be installed by <b>horizontal directional drilling</b>, which bores the pipe underground between two small pits, at three locations:</p>
+<ul class="specs">
+  <li><strong>1.</strong> Under U.S. Route 340</li>
+  <li><strong>2.</strong> Under the entrance to Citizens Fire Company</li>
+  <li><strong>3.</strong> Between Grassy Meadow Road and Sternway Drive</li>
+</ul>
+<div class="callout"><p><b>Emergency access stays open.</b> The fire company entrance was originally planned as an open trench. It was changed to directional drilling so Citizens Fire Company can enter and leave without interruption. No complete closure of Citizens Way is expected, and CTUB will give advance notice when specific road or lane restrictions are scheduled.</p></div>
+
+<h2>Project timeline</h2>
+<ol class="tl">
+  <li class="yr"><span>2026</span></li>
+  <li><span class="date">October 1, 2026</span><p>CTUB proposes a temporary construction easement to Citizens Fire Company for a soil stockpile and drilling pit. The fire company verbally approves.</p></li>
+  <li><span class="date">October 27, 2026</span><p>Preconstruction meeting with CTUB, the contractor, the engineer, and the City of Charles Town. Required state permits and approvals are in place.</p></li>
+  <li class="now"><span class="date">October 30, 2026</span><p>CTUB issues a public notice to residents and businesses.</p></li>
+  <li class="gap"><span class="date">November 16, 2026</span><p>Construction scheduled to begin.</p></li>
+  <li class="yr"><span>2027</span></li>
+  <li class="gap"><span class="date">May 15, 2027</span><p>Scheduled completion.</p></li>
+</ol>
+
+<h2>Project partners</h2>
+<ul class="specs">
+  <li><strong>Owner:</strong> Charles Town Utility Board</li>
+  <li><strong>Construction contractor:</strong> Snyder Environmental Services, LLC</li>
+  <li><strong>Engineering consultant:</strong> Gwin, Dobson &amp; Foreman, Inc.</li>
+</ul>
+
+<h2>Documents and records</h2>
+<ul class="docs">
+  <li><span class="d">Oct. 30, 2026</span><span class="stub">Public Notice: Greenfield Force Main Upgrade &amp; Samuel Street Pump Station Improvements, with project map (to be posted)</span></li>
+</ul>
+
+<h2>What's next?</h2>
+<p>Construction is scheduled to begin November 16, 2026. The schedule may change with weather, site conditions, permitting, and other construction factors. Project updates, including significant schedule changes and expected traffic impacts, will be posted on CTUB's website and Facebook page as work progresses. Questions can be directed to CTUB at (304) 725-2316.</p>
+${CONTACTBLOCK}
+
+${SITELINK}
+`
+};
+
+/* ================= Sidewinder ================= */
+PAGES["/sidewinder"] = {
+  html: `
+<a class="backlink" href="#/">&#8592; All current projects</a>
+<h1>Sidewinder Enterprises, LLC / Mountain Pure</h1>
+<div class="titlemeta"><span class="pill">Active</span><span class="where">Former 3M/Kodak site, Middleway</span></div>
+
+<div class="facts">
+  <div><div class="fl">Water source</div><div class="fv">Private well</div><div class="fs">on site</div></div>
+  <div><div class="fl">Estimated customers</div><div class="fv">50</div><div class="fs">peak flow of 90 GPM</div></div>
+  <div><div class="fl">State permits</div><div class="fv">April 2024</div><div class="fs">well and treatment, WV Dept. of Health</div></div></div>
+
+${ROLE}
+
+<h2>What is the Sidewinder Enterprises, LLC project in Middleway?</h2>
+<p>The Charles Town Utility Board was approached in May 2021 regarding the former 3M/Kodak plant in Middleway. The property owner wanted to assess options for developing the site. Initially, the developer planned to work with the Berkeley County Public Service Sewer District and Berkeley County Public Service Water District to provide services to the area, with a caveat that the Charles Town Utility Board would serve the property in the future if Sidewinder Enterprises, LLC were to expand their system in the area. In September 2022, Sidewinder began exploring options for an onsite water treatment plant. This meant that the Charles Town Utility Board would need to work with Sidewinder to ensure that proper measures were taken to serve the project site as well as the surrounding community.</p>
+<p>Sidewinder's treatment plant and well permits were issued and approved by the West Virginia Department of Health and Human Resources in March and April 2024. The permits laid out the details for the water infrastructure that would be present at the site:</p>
+<ul class="specs">
+  <li><strong>75,000-GPM</strong> (gallons per minute) water treatment plant</li>
+  <li><strong>9,000 LF</strong> (linear feet) of 12" water line from Well B</li>
+  <li><strong>Two 52-GPM</strong> raw water pumps</li>
+  <li>In-line static mixer</li>
+  <li>Chemical feed and storage facilities for sodium hypochlorite and fluoride</li>
+  <li><strong>100 LF</strong> of buried 16" DI (ductile iron) for chlorine contact</li>
+  <li><strong>22,000-gallon</strong> finished water storage tank</li>
+  <li><strong>Two 45-GPM</strong> finished water pumps</li>
+  <li><strong>422-gallon</strong> hydro-pneumatic tank</li>
+  <li>SCADA/telemetry system</li>
+</ul>
+<p>The project would be sourced from a private well, with 50 estimated customers and a peak flow of 90 GPM.</p>
+
+<h2>Project timeline</h2>
+<ol class="tl">
+  <li class="yr"><span>2021</span></li>
+  <li><span class="date">May 26, 2021</span><p>At a regularly scheduled board meeting, CTUB Board Members are briefed about plans for the 3M/Kodak property in Middleway. The owner was interested in exploring development options for the site.</p></li>
+  <li><span class="date">June 7, 2021</span><p>CTUB issued a letter to the developer and consented to allowing Berkeley County Public Service Sewer District and Berkeley County Public Service Water District to serve the site with a right to serve or acquire any further expansion of the public system or in the event that an on-site system be developed.</p></li>
+  <li class="yr"><span>2022</span></li>
+  <li><span class="date">September 20, 2022</span><p>Sidewinder Enterprises, LLC, begins exploring options for an onsite water treatment plant, with CTUB intended to accept assets upon completion of the treatment plant.</p></li>
+  <li><span class="date">September 28, 2022</span><p>At a regularly scheduled board meeting, the CTUB Board convened into executive session to discuss an agreement with Sidewinder and &ldquo;the investment of public funds or other matters involving or affecting the purchase, sale or lease of property, advance construction planning, the investment of public funds or other matters involving commercial competition, which if made public, might adversely affect the financial or other interest of the state or any political subdivision and involving contract matters.&rdquo;</p>
+    <div class="sub"><p>CTUB Staff and Board Members discussed the proposed agreement and terms in closed session, to protect the project and service opportunity from local competitor, West Virginia American Water (WVAW). While in closed session, CTUB Board Members directed Staff and Legal Counsel to prepare and execute an agreement, per the terms discussed. The Board did not reconvene in open session to motion and approve the direction given to Staff, and this action was not included in the meeting's recording or minutes.</p></div></li>
+  <li class="yr"><span>2023</span></li>
+  <li><span class="date">April 12, 2023</span><p>CTUB engages new general legal counsel and Staff subsequently directs legal counsel to finalize the incomplete agreement with Sidewinder, in consultation and negotiation with Sidewinder.</p></li>
+  <li><span class="date">December 20, 2023</span><p>Sidewinder's engineering subcontractors apply for project permits.</p></li>
+  <li class="yr"><span>2024</span></li>
+  <li><span class="date">April 25, 2024</span><p>Sidewinder receives the necessary well and treatment permits from the West Virginia Department of Health.</p></li>
+  <li><span class="date">April 26, 2024</span><p>The agreement with Sidewinder is executed by former CTUB chairman John Nissel.</p></li>
+  <li class="yr"><span>2025</span></li>
+  <li><span class="date">January 8, 2025</span><p>CTUB voted unanimously to rescind the signed agreement. Nissel signed the agreement under the belief that an approval had been made in a previous public meeting and Board action announced publicly, after reconvening from executive session. However, as previously stated, this was not the case. The board rectified the issue and rescinded the agreement, pledging to make transparency and public comment a priority in future agreements.</p>
+    <div class="sub"><p><b>Note:</b> Executive session is defined by West Virginia's Open Meetings Act as &ldquo;any meeting or part of a meeting of a governing body which is closed to the public.&rdquo; If an item is expected to be discussed in an executive session, CTUB must list that item on its meeting agenda. According to the Open Meetings Act, items involving or affecting the purchase, sale or lease of property, advance construction planning or other matters involving commercial competition may be discussed in executive session if the majority of the members vote to move the item into executive session. However, the body may not vote on the item during the executive session.</p></div></li>
+  <li><span class="date">March 3, 2025</span><p>The Jefferson County Planning Commission voted to deny the Sidewinder concept plan.</p></li>
+  <li><span class="date">March 26, 2025</span><p>At a regularly scheduled board meeting, Board Members direct former CTUB General Manager to bring any future agreements regarding the Mountain Pure project back to the Board for discussion and action.</p></li>
+  <li><span class="date">August 27, 2025</span><p>At a regularly scheduled board meeting, Board Members approved executing a new agreement, side letter, and lease agreement with Sidewinder for the Mountain Pure Project.</p></li>
+  <li><span class="date">September 23, 2025</span><p>CTUB executes the agreement, side letter, and lease agreement with Sidewinder for the Mountain Pure project.</p></li>
+  <li><span class="date">December 3, 2025</span><p>Former CTUB General Manager signs a West Virginia Department of Environmental Protection application affidavit and Stormwater Pollution Prevention Plan.</p>
+    <div class="sub"><p>Per the September 23, 2025 Agreement between CTUB and Sidewinder, Sidewinder is responsible for designing the project to meet all applicable State, Federal, and local regulations, and for submitting plans and specifications to the appropriate State, Federal, and local agencies having jurisdiction over the Project for their approval. CTUB is responsible for signing all permit applications for the project. The agreement also requires that Sidewinder receive prior approval from CTUB in writing before submitting project plans to the West Virginia Bureau of Health, although that permit review and approval was completed in April 2024.</p>
+    <p>Stormwater permit coverage does not mean that the raw water line is legally authorized for construction. The Stormwater General Permit does not change Sidewinder's mandatory compliance with federal, state, or local laws and regulations. The revised agreement signed by CTUB and Sidewinder does not allow the project to move forward without the Jefferson County Planning Commission's approval of Sidewinder's concept plan and proposed land uses.</p></div></li>
+  <li><span class="date">December 12, 2025</span><p>Judge Bridget Cohee affirms the Jefferson County Planning Commission's denial of Sidewinder's concept plan.</p></li>
+  <li class="yr"><span>2026</span></li>
+  <li><span class="date">March 17, 2026</span><p>Sidewinder's project engineer submits the stormwater permit application. The West Virginia Department of Environmental Protection returned the application twice for revisions. The application was resubmitted twice, first on April 15, 2026, and most recently on May 22, 2026.</p></li>
+  <li class="now"><span class="date">September 4, 2026</span><p>The Jefferson County Commission convenes a Special Meeting to discuss an investigation into the Sidewinder Project, including the approved NPDES Stormwater Construction Permit, WVR113389. Current CTUB General Manager contacts DEP Department of Water &amp; Waste Management (DWWM) and Sidewinder's Engineering Consultant.</p>
+    <div class="sub"><p>DWWM informs the approved permit is currently in violation in two areas: 1) unsigned SWPPP document and 2) public notice sign not posted within 72 hours of permit application. DWWM further informs the violations can be remediated with a signed SWPPP and promptly posting public notice sign at construction site.</p>
+    <p>Current CTUB General Manager informs the signed SWPPP cannot be executed without Board review and approval. Sidewinder's Consulting Engineer informs CTUB that public notice sign is now posted, per their direct guidance from DWWM, and provides to CTUB an executed SWPPP signature page, dated December 3, 2025, and signed by the former CTUB General Manager.</p></div></li>
+</ol>
+
+<h2>What's next?</h2>
+<p>CTUB is committed to transparency and providing avenues for public input. CTUB does not have the authority to make decisions regarding land use in Jefferson County, nor issue local or state permits. CTUB's role in the Sidewinder/Mountain Pure project is to establish service to the site, while maintaining the ability to provide service to other current and future Jefferson County customers.</p>
+${CONTACTBLOCK}
+
+<h2>Frequently asked questions</h2>
+
+<details class="faq"><summary>What does CTUB do?</summary><div class="body">
+<p>The Charles Town Utility Board is made up of five members appointed by the Charles Town City Council and has full and complete authority for the governance and oversight of its waterworks and sewage systems in Charles Town, Ranson, and Jefferson County.</p>
+<p class="att" style="margin-top:10px"><b>Attached record</b><a href="#doc">Charles Town Codified Ordinances, Article 147 &mdash; Utility Board.pdf</a></p>
+</div></details>
+
+<details class="faq"><summary>What is CTUB's role in economic development projects?</summary><div class="body">
+<p>While the board does not control which projects are approved in the municipal and county areas the utility serves, they play an important role in ensuring that the water and wastewater infrastructure serving new development will comply with local, state, and federal law. CTUB does not oversee land uses and which economic development projects are built in its service area, but does ensure that the projects are served in a way that is sustainable for the community.</p>
+</div></details>
+
+<details class="faq"><summary>What is the benefit of keeping Charles Town's utilities locally owned?</summary><div class="body">
+<p>Publicly-owned utilities are governed by appointed or elected members of the communities they serve, and have a vested interest in the responsible and safe operation and expansion of utility services. Customers and stakeholders have access to ongoing business at public meetings and can impact the utility’s decision making, to ensure environmentally sustainable and affordable operation.</p>
+</div></details>
+
+<details class="faq"><summary>What steps is CTUB taking to increase transparency and public participation?</summary><div class="body">
+<p>It is important to the board that the public understands how and why decisions are made. That is why CTUB is taking measures to ensure that decisions are clearly communicated to the public in regular and special meetings. This is done through <a href="${BOARD_MEETINGS}" target="_blank" rel="noopener">meeting minutes</a>, social media posts, and a new transparency policy.</p>
+</div></details>
+
+<details class="faq"><summary>Who reviews and approves the permits for a new development project?</summary><div class="body">
+<p>CTUB does not issue permits. A new development needs approvals from several separate authorities, each acting within its own jurisdiction.</p>
+<p>Drinking water infrastructure is reviewed and permitted by the West Virginia Department of Health, Office of Environmental Health Services, which approves the design of public water systems statewide. Wastewater discharge and construction stormwater coverage are permitted by the West Virginia Department of Environmental Protection. Land use decisions, including subdivision and concept plan approval, rest with the county or municipal planning authority.</p>
+<p>CTUB reviews the water and wastewater infrastructure proposed to serve a project and confirms it is designed and built to standards that let the system serve that project without degrading service to existing customers. The Public Service Commission of West Virginia regulates publicly owned water and sewer utilities, and CTUB’s rates and fees fall under its authority.</p>
+</div></details>
+
+<details class="faq"><summary>Why do CTUB's service agreements look similar from project to project?</summary><div class="body">
+<p>CTUB’s service agreements are built from a common set of terms rather than negotiated project by project. Standard terms mean every developer connecting to the system meets the same requirements for infrastructure design, capacity, and cost, whatever the size of the project or who is behind it.</p>
+<p>The agreements also move through a fixed approval structure. Under Article 147, the CTUB Manager prepares, evaluates, and negotiates contracts and agreements, and the Board of Directors holds final review and approval. Neither acts alone.</p>
+<p>The charges that fund new connections are regulated as well. The Public Service Commission has authority over CTUB’s rates and fees and has exercised it, including by substituting its own capacity improvement fee for the one CTUB recommended and the Charles Town City Council approved. Agreements resemble one another because the same rules apply to every project.</p>
+</div></details>
+
+<details class="faq"><summary>How can I contact the board?</summary><div class="body">
+<p>You may contact the board through our website. The form to submit comments or questions can be found on the <a href="${CONTACT}" target="_blank" rel="noopener">contact page</a>.</p>
+</div></details>
+
+${SITELINK}
+`
+};
+
+/* ================= Summit Point ================= */
+PAGES["/summit-point"] = {
+  html: `
+<a class="backlink" href="#/">&#8592; All current projects</a>
+<h1>Summit Point Regional Corridor</h1>
+<div class="titlemeta"><span class="pill soon">In development</span><span class="where">Summit Point, southern Jefferson County</span></div>
+<p class="lede">A proposed public water and sanitary sewer system, and potentially reclaimed water, for the Summit Point area. CTUB is moving forward with a Preliminary Engineering Report, the step state law requires before infrastructure funding can be awarded.</p>
+
+<div class="facts">
+  <div><div class="fl">Today</div><div class="fv">25 wells, 29 septic systems</div><div class="fs">serving the motorsports park site</div></div>
+  <div><div class="fl">Planning estimate</div><div class="fv">$7.7M&ndash;$10.7M</div><div class="fs">2025 feasibility study, on-site option</div></div>
+  <div><div class="fl">Approach</div><div class="fv">Regional extension</div><div class="fs">tied to CTUB's existing plants</div></div>
+  <div><div class="fl">Next step</div><div class="fv">Preliminary Engineering Report</div><div class="fs">required for state funding</div></div>
+</div>
+
+${ROLE}
+
+<h2>What is the Summit Point project?</h2>
+<p>Summit Point Motorsports Park and Training Facility, on several hundred acres in southern Jefferson County, runs on 25 separate wells and 29 separate septic systems, some dating to the 1960s. In January 2024, the facility's operators asked CTUB about public water and sewer service.</p>
+<p>CTUB first studied the site itself. A state source water protection grant paid for a sanitary survey and a preliminary assessment of the site's utilities by the engineering firm Gwin, Dobson &amp; Foreman. The 2025 feasibility study compared options and recommended a water tank and package treatment plant served by a five-mile water or sewer line, at a planning-level cost of $7.7 million to $10.7 million over about five years of design and construction.</p>
+<p>In 2026 the project grew beyond the motorsports park. A developer purchased roughly 235 acres near Summit Point for a possible data center, with an early estimate of 100,000 to 130,000 gallons of water a day, and Board members raised the option of a reclaimed water line from a CTUB wastewater plant for cooling. In June 2026, CTUB's General Manager told the Charles Town City Council that a regional system connected to CTUB's existing water and wastewater plants is now a more viable approach than stand-alone package plants, and could be paired with planned upgrades at the Charles Town wastewater plant to spread fixed costs.</p>
+<div class="callout"><p><b>Who pays.</b> The Board has said it supports serving Summit Point under a state-funded structure, and that it will not back financing that places development risk on existing ratepayers or the City.</p></div>
+
+<h2>Project timeline</h2>
+<ol class="tl">
+  <li class="yr"><span>2024</span></li>
+  <li><span class="date">January 10, 2024</span><p>Representatives of Summit Point Raceway present to the Board on the facility's need for public water and sewer, with support from the West Virginia Economic Development Office and the Jefferson County Development Authority. Staff are directed to work with Summit Point, the JCDA, and the State on grant funding.</p></li>
+  <li><span class="date">May 8, 2024</span><p>Staff report submitting a $35,000 local Source Water Protection Grant application for a sanitary survey of the Summit Point Raceway facility.</p></li>
+  <li><span class="date">September 11, 2024</span><p>The Board unanimously approves OSA Grant Agreement G250412, a $38,000 source water protection grant for Gwin, Dobson &amp; Foreman to perform a preliminary assessment of the utilities at the Summit Point Raceway site.</p></li>
+  <li><span class="date">December 11, 2024</span><p>At a special meeting, the Board unanimously approves the grant agreement for the Summit Point Raceway evaluation.</p></li>
+  <li class="yr"><span>2025</span></li>
+  <li><span class="date">July 9, 2025</span><p>The sanitary survey and service alternatives are presented to the Board. Most existing facilities operate as intended; two drinking water sources tested positive for bacteria, and nitrates were measurable but below standards.</p></li>
+  <li><span class="date">November 12, 2025</span><p>At a special meeting, Region 9 presents a state Economic Enhancement Grant Fund opportunity for a package plant, with no funding available for a line extension. A motion to apply in CTUB's name fails on a 2&ndash;2 vote.</p></li>
+  <li><span class="date">November 25, 2025</span><p>At a special meeting, the Board votes to reconsider and then votes 4&ndash;1 to pursue a $10.5 million economic development grant, on two conditions: any expenses not covered by grants are Summit Point Motorsports' responsibility, and the facility is limited to users on the subject property.</p></li>
+  <li><span class="date">December 2025</span><p>CTUB submits its application to the West Virginia Water Development Authority.</p></li>
+  <li class="yr"><span>2026</span></li>
+  <li><span class="date">January 28, 2026</span><p>The Board is told the available grant has been reduced to $4 million because the state received more applications than expected. Revenue bonds and a tax increment financing district are discussed.</p></li>
+  <li><span class="date">February 11, 2026</span><p>The Board unanimously reaffirms its support for serving Summit Point under a state-funded structure and declines to back financing that places development risk on ratepayers or the City.</p></li>
+  <li><span class="date">February 17, 2026</span><p>The Charles Town City Council declines to authorize bonds for the project and asks for a request for proposals and a rate study first.</p></li>
+  <li><span class="date">March 11, 2026</span><p>The Board unanimously approves issuing a Request for Proposals for a Preliminary Engineering Report for providing service to the Summit Point Motorsports Park.</p></li>
+  <li><span class="date">March 25, 2026</span><p>The Board directs staff to advertise the request for proposals and directs counsel to notify Summit Point Motorsports that CTUB is available to provide service and is moving forward with a Preliminary Engineering Report, which state law requires to receive funding from the Infrastructure and Jobs Development Council.</p></li>
+  <li><span class="date">April 8, 2026</span><p>CTUB posts its <a href="https://ctubwv.com/request-for-engineering-proposals-for-a-preliminary-engineering-report-to-extend-water-sewer-services-to-summit-point-motorsports-park/" target="_blank" rel="noopener">Request for Engineering Proposals</a> to extend water and sewer service to Summit Point Motorsports Park. Proposals are due April 17.</p></li>
+  <li><span class="date">April 29, 2026</span><p>Ryan Stuart Development briefs the Board on a potential data center near Summit Point. Board members discuss a reclaimed water ("purple line") system for cooling, and the Board unanimously approves re-advertising the engineering request with the additions.</p></li>
+  <li><span class="date">June 15, 2026</span><p>CTUB's General Manager presents the case for a regional water and sewer system to the Charles Town City Council, which voices its support.</p></li>
+  <li class="now"><span class="date">June 24, 2026</span><p>The Board receives a Summit Point update and asks the General Manager to follow up with the Board of Education and the JCDA on extending service to South Jefferson Elementary School and on grants for the engineering studies.</p></li>
+</ol>
+
+<h2>Documents and records</h2>
+<ul class="docs">
+  <li><span class="d">Apr. 8, 2026</span><a href="https://ctubwv.com/request-for-engineering-proposals-for-a-preliminary-engineering-report-to-extend-water-sewer-services-to-summit-point-motorsports-park/" target="_blank" rel="noopener">Request for Engineering Proposals: Preliminary Engineering Report, Summit Point Motorsports Park</a></li>
+  <li><span class="d">Mar. 25, 2026</span><a href="${PACKET}1f3fd5d7-dc17-11f0-bb28-005056a89546-b40c45bd-14cb-4cec-99d7-878d4bbb4578-1774536147.pdf" target="_blank" rel="noopener">Board packet, including the draft request for proposals advertisement</a></li>
+  <li><span class="d">2025</span><span class="stub">Gwin, Dobson &amp; Foreman feasibility study and sanitary survey (to be posted)</span></li>
+</ul>
+
+<h2>Board meeting records</h2>
+<p>Minutes for each meeting are published in the packet for the following meeting.</p>
+<ul class="docs">
+  <li><span class="d">Jan. 10, 2024</span><a href="${PACKET}b3a47a99-a4e0-11ee-bb82-0050569183fa-d9165141-4b45-47d9-91ba-c0d53d04b966-1705685603.pdf" target="_blank" rel="noopener">Minutes (in the January 24, 2024 packet)</a></li>
+  <li><span class="d">May 8, 2024</span><a href="${PACKET}9c89d12a-a4e1-11ee-bb82-0050569183fa-b40c45bd-14cb-4cec-99d7-878d4bbb4578-1716474479.pdf" target="_blank" rel="noopener">Minutes (in the May 22, 2024 packet)</a></li>
+  <li><span class="d">Sep. 11, 2024</span><a href="${PACKET}7a8ec3cb-a4e2-11ee-bb82-0050569183fa-b40c45bd-14cb-4cec-99d7-878d4bbb4578-1727191123.pdf" target="_blank" rel="noopener">Minutes (in the September 25, 2024 packet)</a></li>
+  <li><span class="d">Dec. 11, 2024</span><a href="${PACKET}e2212fd0-b894-11ef-ab4b-005056a89546-b40c45bd-14cb-4cec-99d7-878d4bbb4578-1735930679.pdf" target="_blank" rel="noopener">Special meeting minutes (in the January 8, 2025 packet)</a></li>
+  <li><span class="d">July 9, 2025</span><a href="${PACKET}4bbb799a-b89e-11ef-ab4b-005056a89546-b40c45bd-14cb-4cec-99d7-878d4bbb4578-1753290142.pdf" target="_blank" rel="noopener">Minutes (in the July 23, 2025 packet)</a></li>
+  <li><span class="d">Nov. 12 &amp; 25, 2025</span><a href="${PACKET}dbe8a7ef-b89e-11ef-ab4b-005056a89546-b40c45bd-14cb-4cec-99d7-878d4bbb4578-1765307596.pdf" target="_blank" rel="noopener">Special meeting minutes (in the December 10, 2025 packet)</a></li>
+  <li><span class="d">Mar. 11, 2026</span><a href="${PACKET}1f3fd5d7-dc17-11f0-bb28-005056a89546-b40c45bd-14cb-4cec-99d7-878d4bbb4578-1774536147.pdf" target="_blank" rel="noopener">Minutes (in the March 25, 2026 packet)</a></li>
+  <li><span class="d">Mar. 25, 2026</span><a href="${PACKET}657f4588-dc17-11f0-bb28-005056a89546-b40c45bd-14cb-4cec-99d7-878d4bbb4578-1776253754.pdf" target="_blank" rel="noopener">Minutes (in the April 15, 2026 packet)</a></li>
+  <li><span class="d">Apr. 29, 2026</span><a href="${PACKET}849db805-dc17-11f0-bb28-005056a89546-b40c45bd-14cb-4cec-99d7-878d4bbb4578-1778690512.pdf" target="_blank" rel="noopener">Minutes (in the May 13, 2026 packet)</a></li>
+</ul>
+<p>Full agendas and minutes are available on CTUB's <a href="${BOARD_MEETINGS}" target="_blank" rel="noopener">Board Meetings page</a>.</p>
+
+<h2>What's next?</h2>
+<p>CTUB is moving forward with a Preliminary Engineering Report to refine the design and cost of a regional water and sewer system and to support applications for state infrastructure funding. The Jefferson County Development Authority has also applied for a $75,000 USDA grant for preliminary engineering. CTUB will not enter a construction contract unless funding is imminent or has been received.</p>
+${CONTACTBLOCK}
+
+${SITELINK}
+`
+};
+
+/* ================= Augustine Manor ================= */
+PAGES["/augustine-manor"] = {
+  html: `
+<a class="backlink" href="#/">&#8592; All current projects</a>
+<h1>Augustine Manor</h1>
+<div class="titlemeta"><span class="pill soon">In development</span><span class="where">Charles Town</span></div>
+<p class="lede">A residential subdivision of 88 single-family homes and 60 townhomes under review by the City of Charles Town, requiring water and sewer service from the CTUB system.</p>
+
+<div class="facts">
+  <div><div class="fl">Homes planned</div><div class="fv">148</div><div class="fs">88 single-family, 60 townhomes</div></div>
+  <div><div class="fl">Preliminary plan</div><div class="fv">Approved</div><div class="fs">Phase 1, December 22, 2025</div></div>
+  <div><div class="fl">Phase 1 bond</div><div class="fv">$13.39M</div><div class="fs">initiated August 17, 2026</div></div>
+  <div><div class="fl">City file</div><div class="fv">SLD2025-04</div><div class="fs">City of Charles Town</div></div>
+</div>
+
+${ROLE}
+
+<h2>What is the Augustine Manor project?</h2>
+<p>Augustine Manor is a proposed residential subdivision in Charles Town with 88 single-family homes and 60 townhomes, along with open space, recreation areas, and stormwater controls. Land use approval rests with the City of Charles Town, whose Planning Commission approved the Phase 1 preliminary plan in December 2025. In August 2026, the City Council approved initiating a $13.39 million performance and land-disturbance bond covering Phase 1 roads, stormwater, and infrastructure.</p>
+<p class="stub">CTUB service details to be added: water and sewer demand, capacity and availability letter, capacity improvement fees, and the extensions needed to connect the subdivision.</p>
+
+<h2>Project timeline</h2>
+<ol class="tl">
+  <li class="yr"><span>2025</span></li>
+  <li><span class="date">December 22, 2025</span><p>The Charles Town Planning Commission holds a public hearing and approves the Phase 1 preliminary plan with conditions, including additional street trees, reduced street lighting, and resolution of outstanding engineering comments by city staff and the city's consulting engineer.</p></li>
+  <li class="yr"><span>2026</span></li>
+  <li><span class="date">July 27, 2026</span><p>The Planning Commission recommends a consolidated bond of $13,392,400.64 for Phase 1, covering performance and land-disturbance requirements for roads, stormwater, and infrastructure.</p></li>
+  <li class="now"><span class="date">August 17, 2026</span><p>The Charles Town City Council approves initiating the $13,392,400.64 bond for Phase 1 after review by the city's third-party engineer and bond committee.</p></li>
+  <li class="gap"><span class="date">To be added</span><p class="stub">CTUB actions on water and sewer service: availability letter, developer agreement, plan review.</p></li>
+</ol>
+
+<h2>Documents and records</h2>
+<p class="stub">CTUB availability letter, developer agreement, and approved water and sewer plans, as they are issued.</p>
+
+<h2>Board meeting records</h2>
+<p class="stub">Agendas and minutes for each CTUB meeting at which the project is discussed.</p>
+<p>Full agendas and minutes are available on CTUB's <a href="${BOARD_MEETINGS}" target="_blank" rel="noopener">Board Meetings page</a>.</p>
+
+<h2>What's next?</h2>
+<p>With the Phase 1 preliminary plan approved and its bond initiated, the subdivision moves toward final plans and construction. CTUB's role is to review the proposed water and sewer infrastructure and confirm it is designed and built to CTUB's standards, so the system can serve the new homes without degrading service to existing customers.</p>
+${CONTACTBLOCK}
+
+${SITELINK}
+`
+};
+
+function render(){
+  var key = (location.hash || "#/").slice(1);
+  var page = PAGES[key] || PAGES["/"];
+  var main = document.getElementById("main");
+  main.innerHTML = page.html;
+  window.scrollTo(0,0);
+}
+
+window.addEventListener("hashchange", render);
+
+render();
+</script>
+</body>
+</html>
